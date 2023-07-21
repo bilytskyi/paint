@@ -4,6 +4,7 @@ export default class MyBrush extends MyTool {
     constructor(color, stroke, width, id, canvas, socket) {
         super(color, stroke, width, id, canvas, socket)
         this.listen()
+        console.log(socket)
     }
 
     listen() {
