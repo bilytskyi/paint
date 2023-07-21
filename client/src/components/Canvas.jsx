@@ -16,6 +16,7 @@ import MyRect from '../tools/MyRect';
 import MyCircle from '../tools/MyCircle'
 import MyLine from '../tools/MyLine';
 import MyEraser from '../tools/MyEraser';
+import WebSocketService from '../services/WebSocketService';
 
 const Canvas = () => {
   const canvasRef = useRef()
@@ -51,40 +52,29 @@ const Canvas = () => {
 
   useEffect(() => {
     if (userName) {
-      const socket = new WebSocket('wss://paint-bilytskyi.vercel.app/' + '#/' + params.id)
-      dispatch(setSessionID(params.id))
-      // dispatch(setSocket(socket))
-      dispatch(setCurrentTool('mybrush'))
-      socket.onopen = () => {
-        console.log('Connection...')
-        socket.send(JSON.stringify({
-          id: params.id,
-          username: userName,
-          method: 'connection'
-        }))
-      }
-      socket.onmessage = (event) => {
-        let msg = JSON.parse(event.data)
-        switch (msg.method) {
+      WebSocketService.connect(params.id, userName);
+
+      WebSocketService.onMessage((msg) => {
+        const parsedMsg = JSON.parse(msg);
+        switch (parsedMsg.method) {
           case "connection":
-              console.log(`user ${msg.username} join`)
-              break
+            console.log(`user ${parsedMsg.username} join`);
+            break;
           case "draw":
-            console.log(msg)
-              dispatch(setTestAction(msg))
-              drawHandler(msg)
-              break
+            console.log(parsedMsg);
+            dispatch(setTestAction(parsedMsg));
+            drawHandler(parsedMsg);
+            break;
           case "draw2":
-              drawHandler2(msg)
-              break
+            drawHandler2(parsedMsg);
+            break;
           case "init":
-              drawHandler2(msg)
-              break
+            drawHandler2(parsedMsg);
+            break;
         }
-      }
+      });
     }
-    
-  }, [userName])
+  }, [userName]);
 
   const drawHandler2 = (msg) => {
     console.log(msg)

@@ -17,11 +17,13 @@ import MyRect from '../tools/MyRect';
 import MyCircle from '../tools/MyCircle'
 import MyLine from '../tools/MyLine';
 import MyEraser from '../tools/MyEraser'
+import WebSocketService from '../services/WebSocketService';
 
 const Toolbar = () => {
   const dispatch = useDispatch();
   // const canvas = useSelector(state => state.canvas.canvas);
-  const sessionID = useSelector(state => state.canvas.sessionID);
+  const sessionID = useSelector(state => state.canvas.sessionID)
+  const userName = useSelector(state => state.canvas.username)
   const canvas = document.getElementById("canvas");
   const data = useSelector(state => state.canvas.canvas)
   const toolsSetting = useSelector(state => state.tool.toolsSetting)
@@ -45,6 +47,12 @@ const Toolbar = () => {
   const serialize = (canvas) => {
     return canvas.toDataURL();
   }
+
+  useEffect(() => {
+    if (userName && sessionID) {
+      WebSocketService.connect(sessionID, userName);
+    }
+  }, [userName, sessionID]);
 
   useEffect(() => {
     switch (toolsSetting.currentTool) {
@@ -93,9 +101,7 @@ const Toolbar = () => {
   // }, []) 
   // const socket = useSelector(state => state.canvas.socket);
   
-  const socket = new WebSocket('wss://paint-bilytskyi.vercel.app/' + '#/' + sessionID)
-
-  const userName = useSelector(state => state.canvas.username);
+ 
  
   const cnv = useSelector(state => state.canvas.cnv);
 
