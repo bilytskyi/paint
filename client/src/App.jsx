@@ -11,7 +11,7 @@ function App() {
     <Router>
       <>
         <Routes>
-          <Route path='/id=:id' element={<><Toolbar/><Canvas /></>} />
+          <Route path='/:id' element={<><Toolbar/><Canvas /></>} />
           <Route path='/' element={<><Toolbar/><Canvas /><Navigate to={`/id=f${(+new Date()).toString(16)}`} replace/></>} />
         </Routes>
       </>
