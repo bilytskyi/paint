@@ -9,7 +9,7 @@ import Circle from '../tools/Circle';
 import Line from '../tools/Line';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import {useParams} from 'react-router-dom';
+import {useLocation, useParams} from 'react-router-dom';
 import axios from 'axios';
 import MyBrush from '../tools/MyBrush';
 import MyRect from '../tools/MyRect';
@@ -27,6 +27,7 @@ const Canvas = () => {
   console.log(params.id)
   dispatch(setSessionID(params.id))
   const userName = useSelector(state => state.canvas.username);
+  const location = useLocation();
 
   const serialize = (canvas) => {
     return canvas.toDataURL();
@@ -54,8 +55,11 @@ const Canvas = () => {
 
   useEffect(() => {
     if (userName) {
-      const sessionID = params.id; // Assuming you have access to the sessionID from params
-      WebSocketService.connect(sessionID, userName);
+      // Extract the session ID from the URL fragment identifier
+      const sessionID = location.hash.slice(2); // Assuming the hash is of the format '/f...'
+      // Construct the WebSocket URL with the query parameter format
+      const socketURL = `wss://paint-bilytskyi.vercel.app/?id=${sessionID}`;
+      WebSocketService.connect(socketURL, userName);
 
       WebSocketService.onMessage((msg) => {
         const parsedMsg = JSON.parse(msg);
@@ -77,7 +81,7 @@ const Canvas = () => {
         }
       });
     }
-  }, [userName]);
+  }, [userName, location]);
 
   const drawHandler2 = (msg) => {
     console.log(msg)
