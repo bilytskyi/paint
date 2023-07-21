@@ -17,10 +17,13 @@ import MyRect from '../tools/MyRect';
 import MyCircle from '../tools/MyCircle'
 import MyLine from '../tools/MyLine';
 import MyEraser from '../tools/MyEraser'
+import WebSocketService from '../services/WebSocketService'
 
 const Toolbar = () => {
   const dispatch = useDispatch();
   // const canvas = useSelector(state => state.canvas.canvas);
+  const sessionID = useSelector(state => state.canvas.sessionID)
+  const userName = useSelector(state => state.canvas.username)
   const canvas = document.getElementById("canvas");
   const data = useSelector(state => state.canvas.canvas)
   const toolsSetting = useSelector(state => state.tool.toolsSetting)
@@ -44,57 +47,64 @@ const Toolbar = () => {
   const serialize = (canvas) => {
     return canvas.toDataURL();
   }
+  console.log('here')
+  console.log(sessionID, userName)
+  useEffect(() => {
+    if (userName && sessionID) {
+      console.log(sessionID, userName)
+      WebSocketService.connect(sessionID, userName);
+    }
+  }, [userName, sessionID]);
 
   useEffect(() => {
     switch (toolsSetting.currentTool) {
-      case 'line':
-          new Line(toolsSetting.line, sessionID)
-          dispatch(setCurrentTool('line'))
-          break;
-      case 'circle':
-          new Circle(toolsSetting.circle, sessionID)
-          dispatch(setCurrentTool('circle'))
-          break;
-      case 'rect':
-        console.log('rect case')
-          new Rect(toolsSetting.rect, sessionID)
-          dispatch(setCurrentTool('rect'))
-          break;
-      case 'brush':
-          console.log('brush case')
-          new Brush(toolsSetting.brush, sessionID)
-          dispatch(setCurrentTool('brush'))
-          break;
-      case 'eraser':
-          new Eraser(toolsSetting.eraser, sessionID)
-          dispatch(setCurrentTool('eraser'))
-          break;
+      // case 'line':
+      //     new Line(toolsSetting.line, sessionID)
+      //     dispatch(setCurrentTool('line'))
+      //     break;
+      // case 'circle':
+      //     new Circle(toolsSetting.circle, sessionID)
+      //     dispatch(setCurrentTool('circle'))
+      //     break;
+      // case 'rect':
+      //   console.log('rect case')
+      //     new Rect(toolsSetting.rect, sessionID)
+      //     dispatch(setCurrentTool('rect'))
+      //     break;
+      // case 'brush':
+      //     console.log('brush case')
+      //     new Brush(toolsSetting.brush, sessionID)
+      //     dispatch(setCurrentTool('brush'))
+      //     break;
+      // case 'eraser':
+      //     new Eraser(toolsSetting.eraser, sessionID)
+      //     dispatch(setCurrentTool('eraser'))
+      //     break;
       case 'mybrush':
-          new MyBrush(toolsSetting.mybrush, sessionID)
+          new MyBrush(toolsSetting.mybrush, WebSocketService, sessionID)
           break;
       case 'myrect':
-          new MyRect(toolsSetting.myrect, sessionID)
+          new MyRect(toolsSetting.myrect, WebSocketService, sessionID)
           break;
       case 'mycircle':
-          new MyCircle(toolsSetting.mycircle, sessionID)
+          new MyCircle(toolsSetting.mycircle, WebSocketService, sessionID)
           break;
       case 'myline':
-        new MyLine(toolsSetting.myline, sessionID)
+        new MyLine(toolsSetting.myline, WebSocketService, sessionID)
         break;
       case 'myeraser':
-        new MyEraser(toolsSetting.myeraser, sessionID)
+        new MyEraser(toolsSetting.myeraser, WebSocketService, sessionID)
         break;
     }
-  }, [toolsSetting])
+  }, [toolsSetting, sessionID])
 
   // useEffect(() => {
   //   deserialize(data, canvas)
   // }, []) 
   // const socket = useSelector(state => state.canvas.socket);
-  const socket = new WebSocket('ws://localhost:5000/')
-
-  const userName = useSelector(state => state.canvas.username);
-  const sessionID = useSelector(state => state.canvas.sessionID);
+  
+ 
+ 
   const cnv = useSelector(state => state.canvas.cnv);
 
   const fff = () => {

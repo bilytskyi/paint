@@ -1,11 +1,11 @@
 export default class Tool {
-    constructor(settings, id) {
+    constructor(settings, socket, id) {
         this.color = settings.color
         this.stroke = settings.stroke
         this.width = settings.width
         this.id = id
         this.canvas = document.getElementById("canvas")
-        this.socket = new WebSocket('ws://localhost:5000/')
+        this.socket = socket
         this.destroy()       
     }
 

@@ -9,13 +9,14 @@ import Circle from '../tools/Circle';
 import Line from '../tools/Line';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import {useParams} from 'react-router-dom';
+import {useLocation, useParams} from 'react-router-dom';
 import axios from 'axios';
 import MyBrush from '../tools/MyBrush';
 import MyRect from '../tools/MyRect';
 import MyCircle from '../tools/MyCircle'
 import MyLine from '../tools/MyLine';
 import MyEraser from '../tools/MyEraser';
+import WebSocketService from '../services/WebSocketService';
 
 const Canvas = () => {
   const canvasRef = useRef()
@@ -23,7 +24,10 @@ const Canvas = () => {
   const [modal, setModal] = useState(true)
   const params = useParams()
   const dispatch = useDispatch();
+  console.log(params.id)
+  dispatch(setSessionID(params.id))
   const userName = useSelector(state => state.canvas.username);
+  const location = useLocation();
 
   const serialize = (canvas) => {
     return canvas.toDataURL();
@@ -51,40 +55,33 @@ const Canvas = () => {
 
   useEffect(() => {
     if (userName) {
-      const socket = new WebSocket('ws://localhost:5000/')
-      dispatch(setSessionID(params.id))
-      // dispatch(setSocket(socket))
-      dispatch(setCurrentTool('mybrush'))
-      socket.onopen = () => {
-        console.log('Connection...')
-        socket.send(JSON.stringify({
-          id: params.id,
-          username: userName,
-          method: 'connection'
-        }))
-      }
-      socket.onmessage = (event) => {
-        let msg = JSON.parse(event.data)
-        switch (msg.method) {
+      // Extract the session ID from the URL fragment identifier
+      const sessionID = location.hash.slice(2); // Assuming the hash is of the format '/f...'
+      // Construct the WebSocket URL with the query parameter format
+      const socketURL = `wss://localhost:5000/`;
+      WebSocketService.connect(socketURL, userName);
+
+      WebSocketService.onMessage((msg) => {
+        const parsedMsg = JSON.parse(msg);
+        switch (parsedMsg.method) {
           case "connection":
-              console.log(`user ${msg.username} join`)
-              break
+            console.log(`user ${parsedMsg.username} join`);
+            break;
           case "draw":
-            console.log(msg)
-              dispatch(setTestAction(msg))
-              drawHandler(msg)
-              break
+            console.log(parsedMsg);
+            dispatch(setTestAction(parsedMsg));
+            drawHandler(parsedMsg);
+            break;
           case "draw2":
-              drawHandler2(msg)
-              break
+            drawHandler2(parsedMsg);
+            break;
           case "init":
-              drawHandler2(msg)
-              break
+            drawHandler2(parsedMsg);
+            break;
         }
-      }
+      });
     }
-    
-  }, [userName])
+  }, [userName, location]);
 
   const drawHandler2 = (msg) => {
     console.log(msg)
