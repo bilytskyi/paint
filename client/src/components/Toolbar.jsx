@@ -21,6 +21,7 @@ import MyEraser from '../tools/MyEraser'
 const Toolbar = () => {
   const dispatch = useDispatch();
   // const canvas = useSelector(state => state.canvas.canvas);
+  const sessionID = useSelector(state => state.canvas.sessionID);
   const canvas = document.getElementById("canvas");
   const data = useSelector(state => state.canvas.canvas)
   const toolsSetting = useSelector(state => state.tool.toolsSetting)
@@ -91,10 +92,11 @@ const Toolbar = () => {
   //   deserialize(data, canvas)
   // }, []) 
   // const socket = useSelector(state => state.canvas.socket);
+  
   const socket = new WebSocket('wss://paint-bilytskyi.vercel.app/' + '#/' + sessionID)
 
   const userName = useSelector(state => state.canvas.username);
-  const sessionID = useSelector(state => state.canvas.sessionID);
+ 
   const cnv = useSelector(state => state.canvas.cnv);
 
   const fff = () => {
