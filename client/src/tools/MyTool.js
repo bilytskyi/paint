@@ -5,7 +5,7 @@ export default class Tool {
         this.width = settings.width
         this.id = id
         this.canvas = document.getElementById("canvas")
-        this.socket = new WebSocket('ws://localhost:5000/')
+        this.socket = new WebSocket('wss://paint-bilytskyi.vercel.app/')
         this.destroy()       
     }
 

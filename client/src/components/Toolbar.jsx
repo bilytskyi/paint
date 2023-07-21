@@ -91,7 +91,7 @@ const Toolbar = () => {
   //   deserialize(data, canvas)
   // }, []) 
   // const socket = useSelector(state => state.canvas.socket);
-  const socket = new WebSocket('ws://localhost:5000/')
+  const socket = new WebSocket('wss://paint-bilytskyi.vercel.app/')
 
   const userName = useSelector(state => state.canvas.username);
   const sessionID = useSelector(state => state.canvas.sessionID);
