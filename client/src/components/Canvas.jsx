@@ -24,6 +24,8 @@ const Canvas = () => {
   const [modal, setModal] = useState(true)
   const params = useParams()
   const dispatch = useDispatch();
+  console.log(params.id)
+  dispatch(setSessionID(params.id))
   const userName = useSelector(state => state.canvas.username);
 
   const serialize = (canvas) => {
