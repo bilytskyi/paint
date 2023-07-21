@@ -33,6 +33,15 @@ class WebSocketService {
         this.socket.close();
       }
     }
+  
+    // Add an event listener to handle incoming messages from the server
+    onMessage(callback) {
+      if (this.socket) {
+        this.socket.onmessage = (event) => {
+          callback(event.data);
+        };
+      }
+    }
   }
   
   export default new WebSocketService();
