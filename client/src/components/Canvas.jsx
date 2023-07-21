@@ -58,7 +58,7 @@ const Canvas = () => {
       // Extract the session ID from the URL fragment identifier
       const sessionID = location.hash.slice(2); // Assuming the hash is of the format '/f...'
       // Construct the WebSocket URL with the query parameter format
-      const socketURL = `wss://paint-bilytskyi.vercel.app/${sessionID}`;
+      const socketURL = `wss://paint-bilytskyi.vercel.app`;
       WebSocketService.connect(socketURL, userName);
 
       WebSocketService.onMessage((msg) => {
