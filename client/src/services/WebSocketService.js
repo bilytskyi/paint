@@ -4,7 +4,7 @@ class WebSocketService {
     }
   
     connect(sessionID, userName) {
-      this.socket = new WebSocket(`wss://paint-bilytskyi.vercel.app/`);
+      this.socket = new WebSocket(`wss://paint-bilytskyi.vercel.app/${sessionID}`);
       this.socket.onopen = () => {
         console.log('Connection...');
         this.socket.send(
