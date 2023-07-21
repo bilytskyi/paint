@@ -53,28 +53,31 @@ const Canvas = () => {
   }, []) 
 
   useEffect(() => {
-    // Handle incoming messages here using the WebSocketService's onMessage method
-    WebSocketService.onMessage((msg) => {
-      const parsedMsg = JSON.parse(msg);
-      switch (parsedMsg.method) {
-        case 'connection':
-          console.log(`user ${parsedMsg.username} join`);
-          break;
-        case 'draw':
-          console.log(parsedMsg);
-          dispatch(setTestAction(parsedMsg));
-          drawHandler(parsedMsg);
-          break;
-        case 'draw2':
-          drawHandler2(parsedMsg);
-          break;
-        case 'init':
-          drawHandler2(parsedMsg);
-          break;
-        // Add other cases as needed
-      }
-    });
-  }, [dispatch]);
+    if (userName) {
+      const sessionID = params.id; // Assuming you have access to the sessionID from params
+      WebSocketService.connect(sessionID, userName);
+
+      WebSocketService.onMessage((msg) => {
+        const parsedMsg = JSON.parse(msg);
+        switch (parsedMsg.method) {
+          case "connection":
+            console.log(`user ${parsedMsg.username} join`);
+            break;
+          case "draw":
+            console.log(parsedMsg);
+            dispatch(setTestAction(parsedMsg));
+            drawHandler(parsedMsg);
+            break;
+          case "draw2":
+            drawHandler2(parsedMsg);
+            break;
+          case "init":
+            drawHandler2(parsedMsg);
+            break;
+        }
+      });
+    }
+  }, [userName]);
 
   const drawHandler2 = (msg) => {
     console.log(msg)
