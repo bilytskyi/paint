@@ -53,7 +53,7 @@ app.get('/image', (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'client/build')));
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client', 'index.html'));
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 });
 
 app.listen(PORT, () => console.log(`server started on PORT ${PORT}`))
