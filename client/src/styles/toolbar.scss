@@ -1,0 +1,117 @@
+@import "./variables.scss";
+
+.toolbar {
+    // height: $toolbar-height;
+
+    // background-color: white;
+    // display: flex;
+    // flex-direction: column;
+    // top: 0; left: 0; bottom: 0; right: 0;
+    // margin: auto;
+    // margin-top: 200px;
+    // align-items: center;
+    // position: fixed;
+    // width: 60px;
+    // height: auto;
+    // box-shadow: 0 4px 5px grey;
+    // z-index: 999;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    position: fixed;
+    background-color: white;
+    border: solid 1px black;
+    border-radius: 37px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    top: 44%;
+    left: 32px;
+
+    &__btn {
+        height: 36px;
+        width: 36px;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        background-size: cover;
+        z-index: 1;
+        background-color: white;
+    }
+    &__btn svg {
+        pointer-events: none;
+    }
+    .brush {
+        background: url("../assets/img/brush.png") no-repeat center center;
+    }
+    .rect {
+        background: url("../assets/img/rect.png") no-repeat center center;
+    }
+    .circle {
+        background: url("../assets/img/circle.png") no-repeat center center;
+    }
+    .eraser {
+        background: url("../assets/img/eraser.png") no-repeat center center;
+    }
+    .line {
+        background: url("../assets/img/line.png") no-repeat center center;
+    }
+    .undo {
+        margin-left: auto;
+        background: url("../assets/img/undo.png") no-repeat center center;
+    }
+    .redo {
+        background: url("../assets/img/redo.png") no-repeat center center;
+    }
+    .save {
+        background: url("../assets/img/save.png") no-repeat center center;
+    }
+    .test {
+        background: url("../assets/img/103414.png");
+        background-size: cover;
+    }
+    &__brush__setting {
+        left: 65px;
+        top: -30px;
+        position: absolute;
+        background-color: #f9f9f9;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        padding: 12px 16px;
+        border: solid 1px black;
+    }
+
+    &__figures__setting {
+        left: 65px;
+        top: -30px;
+        position: absolute;
+        background-color: #f9f9f9;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        padding: 12px 16px;
+        border: solid 1px black;
+
+        .figures {
+            display: flex;
+            gap: 8px;
+
+            svg {
+                cursor: pointer;
+            }
+        }
+    }
+
+.hidden {
+    position: absolute;
+    left: 10px;
+    top: 20px;
+    display: none;
+    height: 150px;
+    width: 200px;
+    background-color: coral;
+}
+
+input {
+    cursor: pointer;
+}
+}
