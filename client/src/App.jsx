@@ -4,15 +4,15 @@ import SettingBar from "./components/SettingBar"
 import Toolbar from "./components/Toolbar";
 import "./styles/app.scss"
 
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
   return (
     <Router>
       <>
         <Routes>
-          <Route path='/:id' element={<><Toolbar/><Canvas /></>} />
-          <Route path='/' element={<><Toolbar/><Canvas /><Navigate to={`/f${(+new Date()).toString(16)}`} replace/></>} />
+          <Route path='/id=:id' element={<><Toolbar/><Canvas /></>} />
+          <Route path='/' element={<><Toolbar/><Canvas /><Navigate to={`/id=f${(+new Date()).toString(16)}`} replace/></>} />
         </Routes>
       </>
     </Router>
