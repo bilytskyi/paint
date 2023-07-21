@@ -47,7 +47,8 @@ const Toolbar = () => {
   const serialize = (canvas) => {
     return canvas.toDataURL();
   }
-
+  console.log('here')
+  console.log(sessionID, userName)
   useEffect(() => {
     if (userName && sessionID) {
       console.log(sessionID, userName)
