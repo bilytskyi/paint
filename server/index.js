@@ -10,7 +10,7 @@ const path = require('path')
 app.use(cors())
 app.use(express.json({ limit: '1000kb' }))
 
-app.ws('', (ws, req) => {
+app.ws('/', (ws, req) => {
     ws.on('message', (msg) => {
         msg = JSON.parse(msg)
         switch (msg.method) {
