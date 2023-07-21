@@ -51,7 +51,7 @@ const Canvas = () => {
 
   useEffect(() => {
     if (userName) {
-      const socket = new WebSocket('wss://paint-bilytskyi.vercel.app/')
+      const socket = new WebSocket('wss://paint-bilytskyi.vercel.app/' + '#/' + params.id)
       dispatch(setSessionID(params.id))
       // dispatch(setSocket(socket))
       dispatch(setCurrentTool('mybrush'))
