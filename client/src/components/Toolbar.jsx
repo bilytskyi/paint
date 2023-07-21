@@ -50,6 +50,7 @@ const Toolbar = () => {
 
   useEffect(() => {
     if (userName && sessionID) {
+      console.log(sessionID, userName)
       WebSocketService.connect(sessionID, userName);
     }
   }, [userName, sessionID]);
