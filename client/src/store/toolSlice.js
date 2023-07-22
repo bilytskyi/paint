@@ -10,7 +10,7 @@ const toolSlice = createSlice({
             circle: {color: '#ffffff', stroke: '#000000', width: 1},
             eraser: {color: '#ffffff', stroke: '#ffffff', width: 1},
             rect: {color: '#ffffff', stroke: '#000000', width: 1},
-            mybrush: {color: 'green', stroke: 'green', width: 25},
+            mybrush: {color: '#10a8ea', stroke: '#10a8ea', width: 12},
             myrect: {color: 'blue', stroke: 'red', width: 5},
             mycircle: {color: 'pink', stroke: 'orange', width: 10},
             myline: {color: 'black', stroke: 'black', width: 1},

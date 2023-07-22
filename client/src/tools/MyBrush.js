@@ -17,8 +17,8 @@ export default class MyBrush extends MyTool {
     }
     
     start(e) {
-        this.x = e.pageX - this.canvas.offsetLeft
-        this.y = e.pageY - this.canvas.offsetTop
+        this.x = Math.round(e.pageX - this.canvas.offsetLeft)
+        this.y = Math.round(e.pageY - this.canvas.offsetTop)
         this.is_drawing = true
         this.socket.send(JSON.stringify({
             method: "draw2",
@@ -35,8 +35,8 @@ export default class MyBrush extends MyTool {
     }
 
     move(e) {
-        this.x = e.pageX - this.canvas.offsetLeft
-        this.y = e.pageY - this.canvas.offsetTop
+        this.x = Math.round(e.pageX - this.canvas.offsetLeft)
+        this.y = Math.round(e.pageY - this.canvas.offsetTop)
         if (this.is_drawing) {
             this.socket.send(JSON.stringify({
                 method: "draw2",
@@ -83,7 +83,7 @@ export default class MyBrush extends MyTool {
         ctx.stroke()
     }
 
-    static stop(ctx) {
+    static end(ctx) {
         ctx.closePath()
     }
 

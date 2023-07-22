@@ -17,12 +17,13 @@ import MyRect from '../tools/MyRect';
 import MyCircle from '../tools/MyCircle'
 import MyLine from '../tools/MyLine';
 import MyEraser from '../tools/MyEraser'
+import drawFromMemory from '../utilities/DrawFromMemory';
 
 const Toolbar = () => {
   const dispatch = useDispatch();
   // const canvas = useSelector(state => state.canvas.canvas);
   const canvas = document.getElementById("canvas");
-  const data = useSelector(state => state.canvas.canvas)
+  const data = useSelector(state => state.canvas.data)
   const toolsSetting = useSelector(state => state.tool.toolsSetting)
   const undoList = useSelector(state => state.canvas.undoList)
   const lineSetting = useSelector(state => state.tool.line)
@@ -91,7 +92,7 @@ const Toolbar = () => {
   //   deserialize(data, canvas)
   // }, []) 
   // const socket = useSelector(state => state.canvas.socket);
-  const socket = new WebSocket('ws://localhost:5000/')
+  // const socket = new WebSocket('ws://localhost:5000/')
 
   const userName = useSelector(state => state.canvas.username);
   const sessionID = useSelector(state => state.canvas.sessionID);
@@ -157,16 +158,20 @@ const Toolbar = () => {
   }
 
   const clear = () => {
-    socket.send(JSON.stringify({
-      method: "draw2",
-      id: sessionID,
-      tool: {
-          name: "clear"
-      }
-  }))
+    const ctx = canvas.getContext('2d')
+    ctx.clearRect(0, 0, 1920, 1080)
+  //   socket.send(JSON.stringify({
+  //     method: "draw2",
+  //     id: sessionID,
+  //     tool: {
+  //         name: "clear"
+  //     }
+  // }))
+
+
   }
 
-  const consoleSize = (array) => {
+const consoleSize = (array) => {
     // Convert array to JSON string
 const jsonString = JSON.stringify(array);
 
@@ -196,6 +201,13 @@ reader.onload = function(event) {
 // Read the Blob as text
 reader.readAsText(blob);
   }
+
+
+const getSize = (canvas) => {
+  let k = canvas.toDataURL()
+  console.log(k)
+
+}
 
 const iconsSizes = [26, 26]
 const [openBrush, setOpenBrush] = useState(false)
@@ -259,6 +271,10 @@ window.addEventListener("click", (e) => {
         <button onClick={() => {dispatch(setCurrentTool('mycircle'))}}>circle</button>
         <button onClick={() => {dispatch(setCurrentTool('myline'))}}>line</button>
         <button onClick={() => {dispatch(setCurrentTool('myeraser'))}}>eraser</button>
+        <button onClick={() => {console.log(testAction)}}>actions</button>
+        <button onClick={() => {console.log(data)}}>data</button>
+        <button onClick={() => {getSize(canvas)}}>size</button>
+        <button onClick={() => {drawFromMemory(data, canvas)}}>memory</button>
 
         {/* <EraserButton 
         width={iconsSizes[0]} 

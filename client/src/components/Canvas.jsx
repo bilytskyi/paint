@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import "../styles/canvas.scss"
 import { useDispatch, useSelector } from 'react-redux';
-import {setCanvas, pushToUndo, setSessionID, setUserName, setSocket, setTestAction} from '../store/canvasSlice';
+import {setCanvas, setData, pushToUndo, setSessionID, setUserName, setSocket, setTestAction} from '../store/canvasSlice';
 import {setCurrentTool} from '../store/toolSlice';
 import Brush from '../tools/Brush';
 import Rect from '../tools/Rect';
@@ -16,6 +16,7 @@ import MyRect from '../tools/MyRect';
 import MyCircle from '../tools/MyCircle'
 import MyLine from '../tools/MyLine';
 import MyEraser from '../tools/MyEraser';
+import drawFromMemory from '../utilities/DrawFromMemory';
 
 const Canvas = () => {
   const canvasRef = useRef()
@@ -24,29 +25,39 @@ const Canvas = () => {
   const params = useParams()
   const dispatch = useDispatch();
   const userName = useSelector(state => state.canvas.username);
+  const data = useSelector(state => state.canvas.data)
 
   const serialize = (canvas) => {
     return canvas.toDataURL();
   }
 
+  // useEffect(() => {
+  //   dispatch(setCanvas({canvas: serialize(canvasRef.current)}))
+  //   let ctx = canvasRef.current.getContext('2d')
+  //       axios.get(`http://localhost:5000/image?id=${params.id}`)
+  //           .then(response => {
+  //               const img = new Image()
+  //               img.src = response.data
+  //               img.onload = () => {
+  //                   // ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+  //                   // ctx.drawImage(img, 0, 0, canvasRef.current.width, canvasRef.current.height)
+  //                   ctx.clearRect(0, 0, 1920, 1080)
+  //                   ctx.drawImage(img, 0, 0, 1920, 1080)
+  //               }
+  //           })
+  //   console.log(ctx)
+  // }, []) 
+
   useEffect(() => {
-    // dispatch(setCnv(canvasRef.current.toDataURL()))
-    // dispatch(setCanvas({canvas: serialize(canvasRef.current)}))
-    // dispatch(setCanvas({canvas: canvasRef.current}))
     dispatch(setCanvas({canvas: serialize(canvasRef.current)}))
     let ctx = canvasRef.current.getContext('2d')
-        axios.get(`http://localhost:5000/image?id=${params.id}`)
+        axios.get(`http://localhost:5000/text?id=save`)
             .then(response => {
-                const img = new Image()
-                img.src = response.data
-                img.onload = () => {
-                    // ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
-                    // ctx.drawImage(img, 0, 0, canvasRef.current.width, canvasRef.current.height)
-                    ctx.clearRect(0, 0, 1920, 1080)
-                    ctx.drawImage(img, 0, 0, 1920, 1080)
-                }
+                console.log(response.data)
+                drawFromMemory(response.data, canvasRef.current)
+                dispatch(setData(response.data))
+
             })
-    console.log(ctx)
   }, []) 
 
   useEffect(() => {
@@ -76,6 +87,7 @@ const Canvas = () => {
               break
           case "draw2":
               drawHandler2(msg)
+              memoryHandler(msg)
               break
           case "init":
               drawHandler2(msg)
@@ -88,6 +100,7 @@ const Canvas = () => {
 
   const drawHandler2 = (msg) => {
     console.log(msg)
+    dispatch(setTestAction(msg))
     const ctx = canvasRef.current.getContext('2d')
     switch (msg.method) {
       case "init":
@@ -169,6 +182,35 @@ const Canvas = () => {
     }
   }
 
+  const memoryHandler = (msg) => {
+    const tool = msg.tool
+    let chunk = ''
+    switch (tool.name){
+      case "brush": 
+      switch (tool.method) {
+        case "start":
+          chunk = `A,${tool.x},${tool.y};`
+          // chunk = `A${tool.x}${tool.y};`
+          dispatch(setData(chunk))
+          console.log(chunk)
+          break
+        case "move":
+          chunk = `B,${tool.x},${tool.y},${tool.st},${tool.wd};`
+          // chunk = `${tool.st}${tool.wd}B${tool.x}${tool.y};`
+          dispatch(setData(chunk))
+          console.log(chunk)
+          break
+        case "end":
+          chunk = `C;`
+          // chunk = `C;`
+          dispatch(setData(chunk))
+          console.log(chunk)
+          break
+      }
+      break
+    }
+  }
+
   const drawHandler = (msg) => {
     console.log('drawHandler')
     console.log(msg)
@@ -203,9 +245,9 @@ const Canvas = () => {
   }
 
   const mouseDownHandler = () => {
-    dispatch(pushToUndo(canvasRef.current.toDataURL()))
-    axios.post(`http://localhost:5000/image?id=${params.id}`, {img: canvasRef.current.toDataURL()})
-      .then(response => console.log(response.data))
+    // dispatch(pushToUndo(canvasRef.current.toDataURL()))
+    // axios.post(`http://localhost:5000/image?id=${params.id}`, {img: canvasRef.current.toDataURL()})
+    //   .then(response => console.log(response.data))
   }
 
   const connectionHandler = () => {

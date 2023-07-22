@@ -9,9 +9,14 @@ const canvasSlice = createSlice({
         username: '',
         sessionID: null,
         cnv: null,
-        testAction: []
+        testAction: [],
+        data: ''
     },
     reducers: {
+        setData(state, action) {
+            console.log(action.payload)
+            state.data = state.data + action.payload
+        },
         setSocket(state, action) {
             return action.payload
         },
@@ -71,6 +76,6 @@ const canvasSlice = createSlice({
     }
 })
 
-export const {setCanvas, setCnv, pushToUndo, pushToRedo, undo, redo, setUserName, setSocket, setSessionID, setTestAction} = canvasSlice.actions;
+export const {setCanvas, setCnv, setData, pushToUndo, pushToRedo, undo, redo, setUserName, setSocket, setSessionID, setTestAction} = canvasSlice.actions;
 
 export default canvasSlice.reducer;
