@@ -51,6 +51,11 @@ app.ws('/', (ws, req) => {
 //     }
 // })
 
+const _dirname = path.dirname("")
+const buildPath = path.join(_dirname, "../client/dist")
+
+app.use(express.static(buildPath))
+
 app.get('/text', (req, res) => {
     try {
         const file = fs.readFileSync(path.resolve(__dirname, 'files', `${req.query.id}.txt`));
@@ -60,7 +65,18 @@ app.get('/text', (req, res) => {
         console.log(e);
         return res.status(500).json('error');
     }
-});
+})
+
+app.get("/*", (req, res) => {
+    try {
+        res.sendFile(
+            path.join(__dirname, "../client/dist/index.html")
+        )
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json('error');
+    }
+})
 
 app.listen(PORT, () => console.log(`server started on PORT ${PORT}`))
 
