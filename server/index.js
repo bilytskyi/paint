@@ -7,7 +7,20 @@ const PORT = process.env.PORT || 5000
 const fs = require('fs')
 const path = require('path')
 
-app.use(cors())
+
+const allowedOrigins = ['http://16.170.240.78', 'http://example.com']
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+
+app.use(cors(corsOptions))
 app.use(express.json({ limit: '1000kb' }))
 
 app.ws('/', (ws, req) => {
