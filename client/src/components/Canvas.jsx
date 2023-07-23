@@ -62,7 +62,8 @@ const Canvas = () => {
 
   useEffect(() => {
     if (userName) {
-      const socket = new WebSocket('ws://localhost:5000/')
+      // const socket = new WebSocket('ws://localhost:5000/')
+      const socket = new WebSocket('ws://16.170.240.78:5000/')
       dispatch(setSessionID(params.id))
       // dispatch(setSocket(socket))
       dispatch(setCurrentTool('mybrush'))

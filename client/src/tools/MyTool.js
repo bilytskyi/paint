@@ -5,7 +5,10 @@ export default class Tool {
         this.width = settings.width
         this.id = id
         this.canvas = document.getElementById("canvas")
-        this.socket = new WebSocket('ws://localhost:5000/')
+        this.socket = new WebSocket('ws://16.170.240.78:5000/')
+        // this.socket = new WebSocket('ws://localhost:5000/')
+        this.serverUrl = process.env.REACT_APP_SERVER_URL
+        console.log(this.serverUrl)
         this.destroy()       
     }
 

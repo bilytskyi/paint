@@ -8,19 +8,20 @@ const fs = require('fs')
 const path = require('path')
 
 
-const allowedOrigins = ['http://16.170.240.78', 'http://example.com']
+// const allowedOrigins = ['http://16.170.240.78', 'http://example.com']
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-};
+// const corsOptions = {
+//   origin: (origin, callback) => {
+//     if (allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+// };
 
-app.use(cors(corsOptions))
+// app.use(cors(corsOptions))
+app.use(cors())
 app.use(express.json({ limit: '1000kb' }))
 
 app.ws('/', (ws, req) => {
