@@ -14,7 +14,6 @@ const canvasSlice = createSlice({
     },
     reducers: {
         setData(state, action) {
-            console.log(action.payload)
             state.data = state.data + action.payload
         },
         setSocket(state, action) {
@@ -22,18 +21,14 @@ const canvasSlice = createSlice({
         },
         setCnv(state, action) {
             state.cnv = action.payload;
-            console.log(state.cnv)
         },
         setUserName(state, action) {
-            console.log(action)
             state.username = action.payload;
         },
         setSessionID(state, action) {
-            console.log(action)
             state.sessionID = action.payload;
         },
         setCanvas(state, action) {
-            console.log(action.payload.canvas)
             state.canvas = action.payload.canvas;
         },
         pushToUndo(state, action) {

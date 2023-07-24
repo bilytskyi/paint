@@ -53,7 +53,6 @@ const Canvas = () => {
     let ctx = canvasRef.current.getContext('2d')
         axios.get(`http://localhost:5000/text?id=save`)
             .then(response => {
-                console.log(response.data)
                 drawFromMemory(response.data, canvasRef.current)
                 dispatch(setData(response.data))
 
@@ -62,13 +61,12 @@ const Canvas = () => {
 
   useEffect(() => {
     if (userName) {
-      // const socket = new WebSocket('ws://localhost:5000/')
-      const socket = new WebSocket('ws://16.170.240.78:5000/')
+      const socket = new WebSocket('ws://localhost:5000/')
+      // const socket = new WebSocket('ws://16.170.240.78:5000/')
       dispatch(setSessionID(params.id))
       // dispatch(setSocket(socket))
       dispatch(setCurrentTool('mybrush'))
       socket.onopen = () => {
-        console.log('Connection...')
         socket.send(JSON.stringify({
           id: params.id,
           username: userName,
@@ -82,7 +80,6 @@ const Canvas = () => {
               console.log(`user ${msg.username} join`)
               break
           case "draw":
-            console.log(msg)
               dispatch(setTestAction(msg))
               drawHandler(msg)
               break
@@ -100,7 +97,6 @@ const Canvas = () => {
   }, [userName])
 
   const drawHandler2 = (msg) => {
-    console.log(msg)
     dispatch(setTestAction(msg))
     const ctx = canvasRef.current.getContext('2d')
     switch (msg.method) {
@@ -193,19 +189,16 @@ const Canvas = () => {
           chunk = `A,${tool.x},${tool.y};`
           // chunk = `A${tool.x}${tool.y};`
           dispatch(setData(chunk))
-          console.log(chunk)
           break
         case "move":
           chunk = `B,${tool.x},${tool.y},${tool.st},${tool.wd};`
           // chunk = `${tool.st}${tool.wd}B${tool.x}${tool.y};`
           dispatch(setData(chunk))
-          console.log(chunk)
           break
         case "end":
           chunk = `C;`
           // chunk = `C;`
           dispatch(setData(chunk))
-          console.log(chunk)
           break
       }
       break
