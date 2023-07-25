@@ -102,16 +102,16 @@ const Canvas = () => {
               break
           case "draw2":
             actionsQueue.push(msg)
-            console.log(actionsQueue)
-            console.log(indexOfQueue)
-            if(users[userName] === 'start') {
-              console.log('AHTUNG')
-            } else {
-              for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
-                drawHandler2(actionsQueue[indexOfQueue])
-                memoryHandler(actionsQueue[indexOfQueue])
-              }
-            }
+            // console.log(actionsQueue)
+            // console.log(indexOfQueue)
+            // if(users[userName] === 'start') {
+            //   console.log('AHTUNG')
+            // } else {
+            //   for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
+            //     drawHandler2(actionsQueue[indexOfQueue])
+            //     memoryHandler(actionsQueue[indexOfQueue])
+            //   }
+            // }
               break
           case "init":
               drawHandler2(msg)
@@ -122,6 +122,16 @@ const Canvas = () => {
             // Toggle the user's state in the users object
             users[user] = state;
             console.log(users);
+            console.log(actionsQueue)
+            console.log(indexOfQueue)
+            if(users[userName] === 'start') {
+              console.log('AHTUNG')
+            } else {
+              for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
+                drawHandler2(actionsQueue[indexOfQueue])
+                memoryHandler(actionsQueue[indexOfQueue])
+              }
+            }
           }
             break
         }
