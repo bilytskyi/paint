@@ -71,7 +71,8 @@ const Canvas = () => {
       dispatch(setSessionID(params.id))
       dispatch(setCurrentTool('mybrush'))
       let users = {}
-      let drawBuffer = {}
+      const actionsQueue = []
+      let indexOfQueue = 0
       socket.onopen = () => {
         socket.send(JSON.stringify({
           id: params.id,
@@ -81,159 +82,137 @@ const Canvas = () => {
       }
       socket.onmessage = (event) => {
         let msg = JSON.parse(event.data)
-        const { user, state } = msg
-        if (state === "start") {
-          users[user] = state;
-          drawBuffer[user] = []; // Initialize an empty buffer for this user
-          console.log(users);
-        } else if (state === "end") {
-          users[user] = state;
-          console.log(users);
-      
-          // If there are buffered draw2 messages for this user, process them
-          if (drawBuffer[user]) {
-            drawBuffer[user].forEach((bufferedMsg) => {
-              drawHandler2(bufferedMsg);
-              memoryHandler(bufferedMsg);
-            });
-            delete drawBuffer[user]; // Clear the buffer after processing
+        switch (msg.method) {
+          case "connection":
+              console.log(`user ${msg.username} join`)
+              axios.get(`http://${link}/users?id=${params.id}`)
+              .then(response => {
+                const usersArray = response.data
+              // Convert the usersArray to an object and set the default state as "end"
+              users = usersArray.reduce((acc, user) => {
+                acc[user] = "end"
+                return acc
+              }, {})
+              console.log(users)
+              })
+              break
+          case "draw":
+              dispatch(setTestAction(msg))
+              drawHandler(msg)
+              break
+          case "draw2":
+            actionsQueue.push(msg)
+            console.log(actionsQueue)
+            console.log(indexOfQueue)
+            if(users[userName] === 'start') {
+              console.log('AHTUNG')
+            } else {
+              for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
+                drawHandler2(actionsQueue[indexOfQueue])
+                memoryHandler(actionsQueue[indexOfQueue])
+              }
+            }
+              break
+          case "init":
+              drawHandler2(msg)
+              break
+          case "users":
+            const { user, state } = msg;
+          if (state === "start" || state === "end") {
+            // Toggle the user's state in the users object
+            users[user] = state;
+            console.log(users);
           }
+            break
         }
-      
-        // switch (msg.method) {
-        //   case "connection":
-        //       console.log(`user ${msg.username} join`)
-        //       axios.get(`http://${link}/users?id=${params.id}`)
-        //       .then(response => {
-        //         const usersArray = response.data
-        //       // Convert the usersArray to an object and set the default state as "end"
-        //       users = usersArray.reduce((acc, user) => {
-        //         acc[user] = "end"
-        //         return acc
-        //       }, {})
-        //       console.log(users)
-        //       })
-        //       break
-        //   case "draw":
-        //       dispatch(setTestAction(msg))
-        //       drawHandler(msg)
-        //       break
-        //   case "draw2":
-        //       drawHandler2(msg)
-        //       memoryHandler(msg)
-        //       break
-        //   case "init":
-        //       drawHandler2(msg)
-        //       break
-        //   case "users":
-        //     const { user, state } = msg;
-        //   if (state === "start" || state === "end") {
-        //     // Toggle the user's state in the users object
-        //     users[user] = state;
-        //     console.log(users);
-        //   }
-        //     break
-        // }
       }
     }
     
   }, [userName])
 
   const drawHandler2 = (msg) => {
-    dispatch(setTestAction(msg));
-  const ctx = canvasRef.current.getContext("2d");
-  
-  // Only draw when the user's state is "end"
-  if (users[msg.user] === "end") {
+    dispatch(setTestAction(msg))
+    const ctx = canvasRef.current.getContext('2d')
     switch (msg.method) {
-      // ... Your existing drawHandler2 code here ...
+      case "init":
+        console.log(msg.settings)
+        MyRect.init(msg.settings)
+        break
+      case "draw2":
+        switch (msg.tool.name) {
+          case "clear":
+            ctx.clearRect(0, 0, 1920, 1080)
+            break
+          case "brush":
+            switch (msg.tool.method) {
+              case "start1":
+                MyBrush.start(ctx, msg.tool.x, msg.tool.y)
+                break
+              case "end":
+                // MyBrush.end(ctx)
+                MyBrush.draw(ctx, msg.tool.xy, msg.tool.st, msg.tool.wd)
+                break
+              case "move1":
+                MyBrush.move(ctx, msg.tool.x, msg.tool.y, msg.tool.st, msg.tool.wd)
+                break
+            }
+            break
+          case "eraser":
+            switch (msg.tool.method) {
+              case "start":
+                MyEraser.start(ctx, msg.tool.x, msg.tool.y);
+                break
+              case "stop":
+                MyEraser.stop(ctx);
+                break
+              case "move":
+                MyEraser.move(ctx, msg.tool.x, msg.tool.y, msg.tool.wd);
+                break
+            }
+            break
+          case "rect":
+            switch (msg.tool.method) {
+              case "move1":
+                MyRect.move(ctx, msg.tool.x, msg.tool.y, msg.tool.x2, msg.tool.y2, msg.tool.cl, msg.tool.st, msg.tool.wd)
+                break
+              case "end":
+                // MyRect.end(ctx)
+                MyRect.draw(ctx, msg.tool.x, msg.tool.y, msg.tool.w, msg.tool.h, msg.tool.cl, msg.tool.st, msg.tool.wd)
+                break
+              case "start1":
+                MyRect.start(msg.tool.saved)
+                break
+            }
+            break
+          case "circle":
+            switch (msg.tool.method) {
+              case "move":
+                MyCircle.move(ctx, msg.tool.x, msg.tool.y, msg.tool.r, msg.tool.cl, msg.tool.st, msg.tool.wd)
+                break
+              case "end":
+                MyCircle.end(ctx)
+                break
+              case "start":
+                MyCircle.start(msg.tool.saved)
+                break
+            }
+            break
+          case "line":
+            switch (msg.tool.method) {
+              case "move":
+                MyLine.move(ctx, msg.tool.x, msg.tool.y, msg.tool.x2, msg.tool.y2, msg.tool.st, msg.tool.wd)
+                break
+              case "end":
+                MyLine.end(ctx)
+                break
+              case "start":
+                MyLine.start(msg.tool.saved)
+                break
+            }
+            break
+        }
+        break
     }
-  } else if (users[msg.user] === "start") {
-    // If the user's state is "start," buffer the draw2 message for later processing
-    drawBuffer[msg.user].push(msg);
-  }
-    // dispatch(setTestAction(msg))
-    // const ctx = canvasRef.current.getContext('2d')
-    // switch (msg.method) {
-    //   case "init":
-    //     console.log(msg.settings)
-    //     MyRect.init(msg.settings)
-    //     break
-    //   case "draw2":
-    //     switch (msg.tool.name) {
-    //       case "clear":
-    //         ctx.clearRect(0, 0, 1920, 1080)
-    //         break
-    //       case "brush":
-    //         switch (msg.tool.method) {
-    //           case "start1":
-    //             MyBrush.start(ctx, msg.tool.x, msg.tool.y)
-    //             break
-    //           case "end":
-    //             // MyBrush.end(ctx)
-    //             MyBrush.draw(ctx, msg.tool.xy, msg.tool.st, msg.tool.wd)
-    //             break
-    //           case "move1":
-    //             MyBrush.move(ctx, msg.tool.x, msg.tool.y, msg.tool.st, msg.tool.wd)
-    //             break
-    //         }
-    //         break
-    //       case "eraser":
-    //         switch (msg.tool.method) {
-    //           case "start":
-    //             MyEraser.start(ctx, msg.tool.x, msg.tool.y);
-    //             break
-    //           case "stop":
-    //             MyEraser.stop(ctx);
-    //             break
-    //           case "move":
-    //             MyEraser.move(ctx, msg.tool.x, msg.tool.y, msg.tool.wd);
-    //             break
-    //         }
-    //         break
-    //       case "rect":
-    //         switch (msg.tool.method) {
-    //           case "move1":
-    //             MyRect.move(ctx, msg.tool.x, msg.tool.y, msg.tool.x2, msg.tool.y2, msg.tool.cl, msg.tool.st, msg.tool.wd)
-    //             break
-    //           case "end":
-    //             // MyRect.end(ctx)
-    //             MyRect.draw(ctx, msg.tool.x, msg.tool.y, msg.tool.w, msg.tool.h, msg.tool.cl, msg.tool.st, msg.tool.wd)
-    //             break
-    //           case "start1":
-    //             MyRect.start(msg.tool.saved)
-    //             break
-    //         }
-    //         break
-    //       case "circle":
-    //         switch (msg.tool.method) {
-    //           case "move":
-    //             MyCircle.move(ctx, msg.tool.x, msg.tool.y, msg.tool.r, msg.tool.cl, msg.tool.st, msg.tool.wd)
-    //             break
-    //           case "end":
-    //             MyCircle.end(ctx)
-    //             break
-    //           case "start":
-    //             MyCircle.start(msg.tool.saved)
-    //             break
-    //         }
-    //         break
-    //       case "line":
-    //         switch (msg.tool.method) {
-    //           case "move":
-    //             MyLine.move(ctx, msg.tool.x, msg.tool.y, msg.tool.x2, msg.tool.y2, msg.tool.st, msg.tool.wd)
-    //             break
-    //           case "end":
-    //             MyLine.end(ctx)
-    //             break
-    //           case "start":
-    //             MyLine.start(msg.tool.saved)
-    //             break
-    //         }
-    //         break
-    //     }
-    //     break
-    // }
   }
 
   const memoryHandler = (msg) => {
