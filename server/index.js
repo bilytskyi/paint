@@ -77,7 +77,7 @@ app.use(express.static(buildPath))
 app.get("/*", (req, res) => {
     try {
         res.sendFile(
-            path.join(__dirname, "../client/dist/index.html")
+            path.join(_dirname, "../client/dist/index.html")
         )
     } catch (e) {
         console.log(e);
@@ -88,7 +88,7 @@ app.get("/*", (req, res) => {
 
 app.get('/text', (req, res) => {
     try {
-        const file = fs.readFileSync(path.resolve(__dirname, 'files', `${req.query.id}.txt`));
+        const file = fs.readFileSync(path.resolve(_dirname, 'files', `${req.query.id}.txt`));
         const data = file.toString();
         res.send(data);
     } catch (e) {
@@ -100,7 +100,7 @@ app.get('/text', (req, res) => {
 app.post('/users', (req, res) => {
     try {
         const data = req.body.user
-        const filePath = path.resolve(__dirname, 'files', `${req.query.id}.txt`)
+        const filePath = path.resolve(_dirname, 'files', `${req.query.id}.txt`)
         fs.appendFileSync(filePath, data + '\n')
         return res.status(200).json({message: "user added"})
     } catch (e) {
@@ -111,7 +111,7 @@ app.post('/users', (req, res) => {
 
 app.get('/users', (req, res) => {
     try {
-        const filePath = path.resolve(__dirname, 'files', `${req.query.id}.txt`);
+        const filePath = path.resolve(_dirname, 'files', `${req.query.id}.txt`);
         const data = fs.readFileSync(filePath, 'utf-8');
         const usersArray = data.trim().split('\n');
 
