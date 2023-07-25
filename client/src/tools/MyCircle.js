@@ -95,7 +95,6 @@ export default class MyCircle extends MyTool {
     }
 
     static draw(ctx, x, y, r, cl, st, wd) {
-        console.log(x, y, r, cl, st, wd)
         const img = new Image()
         img.src = localStorage.getItem("circleSaved")
         img.onload = () => {

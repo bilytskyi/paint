@@ -17,8 +17,10 @@ import MyCircle from '../tools/MyCircle'
 import MyLine from '../tools/MyLine';
 import MyEraser from '../tools/MyEraser';
 import drawFromMemory from '../utilities/DrawFromMemory';
+import GetLink from '../utilities/GetLink';
 
 const Canvas = () => {
+  const link = GetLink('prod')
   const canvasRef = useRef()
   const usernameRef = useRef()
   const [modal, setModal] = useState(true)
@@ -51,24 +53,24 @@ const Canvas = () => {
   useEffect(() => {
     dispatch(setCanvas({canvas: serialize(canvasRef.current)}))
     let ctx = canvasRef.current.getContext('2d')
-        axios.get(`http://localhost:5000/text?id=save`)
+        axios.get(`http://${link}/text?id=save`)
             .then(response => {
-                console.log(response.data)
-                drawFromMemory(response.data, canvasRef.current)
-                dispatch(setData(response.data))
+                // drawFromMemory(response.data, canvasRef.current)
+                // dispatch(setData(response.data))
 
             })
   }, []) 
 
   useEffect(() => {
     if (userName) {
-      // const socket = new WebSocket('ws://localhost:5000/')
-      const socket = new WebSocket('ws://16.170.240.78:5000/')
+      axios.post(`http://${link}/users?id=${params.id}`, {user: userName})
+      .then(response => console.log(response.data))
+      const socket = new WebSocket(`ws://${link}/`)
+      // const socket = new WebSocket('ws://16.170.240.78:5000/')
       dispatch(setSessionID(params.id))
-      // dispatch(setSocket(socket))
       dispatch(setCurrentTool('mybrush'))
+      let users = {}
       socket.onopen = () => {
-        console.log('Connection...')
         socket.send(JSON.stringify({
           id: params.id,
           username: userName,
@@ -80,9 +82,18 @@ const Canvas = () => {
         switch (msg.method) {
           case "connection":
               console.log(`user ${msg.username} join`)
+              axios.get(`http://${link}/users?id=${params.id}`)
+              .then(response => {
+                const usersArray = response.data
+              // Convert the usersArray to an object and set the default state as "end"
+              users = usersArray.reduce((acc, user) => {
+                acc[user] = "end"
+                return acc
+              }, {})
+              console.log(users)
+              })
               break
           case "draw":
-            console.log(msg)
               dispatch(setTestAction(msg))
               drawHandler(msg)
               break
@@ -93,6 +104,14 @@ const Canvas = () => {
           case "init":
               drawHandler2(msg)
               break
+          case "users":
+            const { user, state } = msg;
+          if (state === "start" || state === "end") {
+            // Toggle the user's state in the users object
+            users[user] = state;
+            console.log(users);
+          }
+            break
         }
       }
     }
@@ -100,7 +119,6 @@ const Canvas = () => {
   }, [userName])
 
   const drawHandler2 = (msg) => {
-    console.log(msg)
     dispatch(setTestAction(msg))
     const ctx = canvasRef.current.getContext('2d')
     switch (msg.method) {
@@ -115,13 +133,14 @@ const Canvas = () => {
             break
           case "brush":
             switch (msg.tool.method) {
-              case "start":
+              case "start1":
                 MyBrush.start(ctx, msg.tool.x, msg.tool.y)
                 break
-              case "stop":
-                MyBrush.stop(ctx)
+              case "end":
+                // MyBrush.end(ctx)
+                MyBrush.draw(ctx, msg.tool.xy, msg.tool.st, msg.tool.wd)
                 break
-              case "move":
+              case "move1":
                 MyBrush.move(ctx, msg.tool.x, msg.tool.y, msg.tool.st, msg.tool.wd)
                 break
             }
@@ -141,13 +160,14 @@ const Canvas = () => {
             break
           case "rect":
             switch (msg.tool.method) {
-              case "move":
+              case "move1":
                 MyRect.move(ctx, msg.tool.x, msg.tool.y, msg.tool.x2, msg.tool.y2, msg.tool.cl, msg.tool.st, msg.tool.wd)
                 break
               case "end":
-                MyRect.end(ctx)
+                // MyRect.end(ctx)
+                MyRect.draw(ctx, msg.tool.x, msg.tool.y, msg.tool.w, msg.tool.h, msg.tool.cl, msg.tool.st, msg.tool.wd)
                 break
-              case "start":
+              case "start1":
                 MyRect.start(msg.tool.saved)
                 break
             }
@@ -192,20 +212,17 @@ const Canvas = () => {
         case "start":
           chunk = `A,${tool.x},${tool.y};`
           // chunk = `A${tool.x}${tool.y};`
-          dispatch(setData(chunk))
-          console.log(chunk)
+          // dispatch(setData(chunk))
           break
         case "move":
           chunk = `B,${tool.x},${tool.y},${tool.st},${tool.wd};`
           // chunk = `${tool.st}${tool.wd}B${tool.x}${tool.y};`
-          dispatch(setData(chunk))
-          console.log(chunk)
+          // dispatch(setData(chunk))
           break
         case "end":
           chunk = `C;`
           // chunk = `C;`
-          dispatch(setData(chunk))
-          console.log(chunk)
+          dispatch(setData(`${tool.xy}-${tool.st},${tool.wd};`))
           break
       }
       break

@@ -94,7 +94,6 @@ export default class MyLine extends MyTool {
     }
 
     static draw(ctx, x, y, x2, y2, st, wd) {
-        console.log(x, y, x2, y2)
         const img = new Image();
         img.src = localStorage.getItem("lineSaved")
         img.onload = () => {
