@@ -65,7 +65,7 @@ const Canvas = () => {
     if (userName) {
       axios.post(`http://${link}/users?id=${params.id}`, {user: userName})
       .then(response => console.log(response.data))
-      const socket = new WebSocket(`ws://${link}/`)
+      const socket = new WebSocket(`ws://${link}:5000/`)
       // const socket = new WebSocket('ws://16.170.240.78:5000/')
       dispatch(setSessionID(params.id))
       dispatch(setCurrentTool('mybrush'))

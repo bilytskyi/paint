@@ -10,7 +10,7 @@ export default class Tool {
         this.id = id
         this.canvas = document.getElementById("canvas")
         // this.socket = new WebSocket('ws://16.170.240.78:5000/')
-        this.socket = new WebSocket(`ws://${link}/`)
+        this.socket = new WebSocket(`ws://${link}:5000/`)
         this.user = user
         this.destroy()       
     }
