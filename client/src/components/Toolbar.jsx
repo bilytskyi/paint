@@ -71,7 +71,7 @@ const Toolbar = () => {
           dispatch(setCurrentTool('eraser'))
           break;
       case 'mybrush':
-          new MyBrush(toolsSetting.mybrush, sessionID)
+          new MyBrush(toolsSetting.mybrush, sessionID, userName)
           break;
       case 'myrect':
           new MyRect(toolsSetting.myrect, sessionID)

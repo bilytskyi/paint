@@ -40,8 +40,36 @@ app.ws('/', (ws, req) => {
             case 'init':
                 broadcastConnection(ws, msg)
                 break
+            case 'users':
+                broadcastConnection(ws, msg)
+                break
         }
     })
+})
+
+app.post('/users', (req, res) => {
+    try {
+        const data = req.body.user
+        const filePath = path.resolve(__dirname, 'files', `${req.query.id}.txt`)
+        fs.appendFileSync(filePath, data + '\n')
+        return res.status(200).json({message: "user added"})
+    } catch (e) {
+        console.log(e)
+        return res.status(500).json('error')
+    }
+})
+
+app.get('/users', (req, res) => {
+    try {
+        const filePath = path.resolve(__dirname, 'files', `${req.query.id}.txt`);
+        const data = fs.readFileSync(filePath, 'utf-8');
+        const usersArray = data.trim().split('\n');
+
+        return res.status(200).json(usersArray);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json('error');
+    }
 })
 
 // app.post('/image', (req, res) => {
@@ -66,19 +94,19 @@ app.ws('/', (ws, req) => {
 // })
 
 // for prodaction
-// const _dirname = path.dirname("")
-// const buildPath = path.join(_dirname, "../client/dist")
-// app.use(express.static(buildPath))
-// app.get("/*", (req, res) => {
-//     try {
-//         res.sendFile(
-//             path.join(__dirname, "../client/dist/index.html")
-//         )
-//     } catch (e) {
-//         console.log(e);
-//         return res.status(500).json('error');
-//     }
-// })
+const _dirname = path.dirname("")
+const buildPath = path.join(_dirname, "../client/dist")
+app.use(express.static(buildPath))
+app.get("/*", (req, res) => {
+    try {
+        res.sendFile(
+            path.join(__dirname, "../client/dist/index.html")
+        )
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json('error');
+    }
+})
 // for prodaction
 
 app.get('/text', (req, res) => {

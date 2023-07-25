@@ -76,6 +76,13 @@ export default class MyRect extends MyTool {
                 tool: {
                     name: "rect",
                     method: "end",
+                    x: this.x,
+                    y: this.y,
+                    w: this.x2 - this.x,
+                    h: this.y2 - this.y,
+                    cl: this.color,
+                    st: this.stroke,
+                    wd: this.width
                 }
             }))
         }
@@ -94,7 +101,7 @@ export default class MyRect extends MyTool {
         ctx.closePath()
     }
 
-    static draw(ctx, x, y, w, h, cl, st, wd) {
+    static draw2(ctx, x, y, w, h, cl, st, wd) {
         const img = new Image()
         img.src = localStorage.getItem("rectSaved")
         img.onload = () => {
@@ -110,6 +117,20 @@ export default class MyRect extends MyTool {
             ctx.fill()
             ctx.stroke()
         }
+    }
+
+    static draw(ctx, x, y, w, h, cl, st, wd) {
+        ctx.beginPath()
+        ctx.fillStyle = cl
+        ctx.strokeStyle = st
+        ctx.lineWidth = wd
+        ctx.lineCap = "butt"
+        ctx.lineJoin = "miter"
+        ctx.moveTo(x, y)
+        ctx.rect(x, y, w, h)
+        ctx.fill()
+        ctx.stroke()
+        ctx.closePath()
     }
 
 }
