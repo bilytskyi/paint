@@ -16,9 +16,14 @@ const toolSlice = createSlice({
             myline: {color: 'black', stroke: 'black', width: 1},
             myeraser: {color: "#FFFFFF", stroke: "#FFFFFF", width: 10}
         },
-        tool: null
+        tool: null,
+        isDrawing: false
     },
     reducers: {
+        setIsDrawing(state, action) {
+            state.isDrawing = action.payload
+            console.log(state.isDrawing)
+        },
         setTool(state, action) {
             console.log(action.payload.tool)
             state.tool = action.payload.tool;
@@ -87,6 +92,6 @@ const toolSlice = createSlice({
     }
 })
 
-export const {setTool, setLineWidth, setFillColor, setStrokeColor, setCurrentTool} = toolSlice.actions;
+export const {setTool, setIsDrawing, setLineWidth, setFillColor, setStrokeColor, setCurrentTool} = toolSlice.actions;
 
 export default toolSlice.reducer;
