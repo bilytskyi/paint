@@ -57,6 +57,7 @@ const Canvas = () => {
             .then(response => {
                 // drawFromMemory(response.data, canvasRef.current)
                 // dispatch(setData(response.data))
+                console.log(response.data)
 
             })
   }, []) 

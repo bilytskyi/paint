@@ -47,30 +47,7 @@ app.ws('/', (ws, req) => {
     })
 })
 
-app.post('/users', (req, res) => {
-    try {
-        const data = req.body.user
-        const filePath = path.resolve(__dirname, 'files', `${req.query.id}.txt`)
-        fs.appendFileSync(filePath, data + '\n')
-        return res.status(200).json({message: "user added"})
-    } catch (e) {
-        console.log(e)
-        return res.status(500).json('error')
-    }
-})
 
-app.get('/users', (req, res) => {
-    try {
-        const filePath = path.resolve(__dirname, 'files', `${req.query.id}.txt`);
-        const data = fs.readFileSync(filePath, 'utf-8');
-        const usersArray = data.trim().split('\n');
-
-        return res.status(200).json(usersArray);
-    } catch (e) {
-        console.log(e);
-        return res.status(500).json('error');
-    }
-})
 
 // app.post('/image', (req, res) => {
 //     try {
@@ -114,6 +91,31 @@ app.get('/text', (req, res) => {
         const file = fs.readFileSync(path.resolve(__dirname, 'files', `${req.query.id}.txt`));
         const data = file.toString();
         res.send(data);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json('error');
+    }
+})
+
+app.post('/users', (req, res) => {
+    try {
+        const data = req.body.user
+        const filePath = path.resolve(__dirname, 'files', `${req.query.id}.txt`)
+        fs.appendFileSync(filePath, data + '\n')
+        return res.status(200).json({message: "user added"})
+    } catch (e) {
+        console.log(e)
+        return res.status(500).json('error')
+    }
+})
+
+app.get('/users', (req, res) => {
+    try {
+        const filePath = path.resolve(__dirname, 'files', `${req.query.id}.txt`);
+        const data = fs.readFileSync(filePath, 'utf-8');
+        const usersArray = data.trim().split('\n');
+
+        return res.status(200).json(usersArray);
     } catch (e) {
         console.log(e);
         return res.status(500).json('error');
