@@ -128,8 +128,13 @@ const Canvas = () => {
               console.log('AHTUNG')
             } else {
               for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
-                drawHandler2(actionsQueue[indexOfQueue])
-                memoryHandler(actionsQueue[indexOfQueue])
+                const msg = actionsQueue[indexOfQueue]
+                if (msg.user === users[user]) {
+                  continue
+                } else {
+                  drawHandler2(msg)
+                  memoryHandler(msg)
+                }
               }
             }
           }
