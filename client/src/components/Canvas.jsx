@@ -71,6 +71,8 @@ const Canvas = () => {
       dispatch(setSessionID(params.id))
       dispatch(setCurrentTool('mybrush'))
       let users = {}
+      const actionsQueue = []
+      let indexOfQueue = 0
       socket.onopen = () => {
         socket.send(JSON.stringify({
           id: params.id,
@@ -99,8 +101,17 @@ const Canvas = () => {
               drawHandler(msg)
               break
           case "draw2":
-              drawHandler2(msg)
-              memoryHandler(msg)
+            actionsQueue.push(msg)
+            console.log(actionsQueue)
+            console.log(indexOfQueue)
+            if(users[userName] === 'start') {
+              console.log('AHTUNG')
+            } else {
+              for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
+                drawHandler2(actionsQueue[indexOfQueue])
+                memoryHandler(actionsQueue[indexOfQueue])
+              }
+            }
               break
           case "init":
               drawHandler2(msg)

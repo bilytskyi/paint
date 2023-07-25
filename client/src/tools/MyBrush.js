@@ -30,6 +30,8 @@ export default class MyBrush extends MyTool {
         this.ctx.lineCap = "round"
         this.ctx.lineJoin = "round"
         this.ctx.moveTo(this.x, this.y)
+        this.ctx.lineTo(this.x, this.y)
+        this.ctx.stroke()
         this.socket.send(JSON.stringify({
             method: "users",
             id: this.id,
