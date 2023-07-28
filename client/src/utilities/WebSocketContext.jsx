@@ -1,4 +1,4 @@
-// WebSocketContext.js
+// WebSocketContext.jsx
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 
 const WebSocketContext = createContext();
@@ -17,9 +17,18 @@ export const WebSocketProvider = ({ children }) => {
     socket.onopen = () => {
       setIsConnected(true);
       socket.send(JSON.stringify({
-        method: 'init'
+        method: "init"
       }))
     };
+
+    // Send a heartbeat message every 30 seconds (adjust the interval as needed)
+      const heartbeatInterval = setInterval(() => {
+        if (socket.readyState === socket.OPEN) {
+          socket.send(JSON.stringify({
+            method: "heartbeat"
+          }));
+        }
+      }, 30000);
 
     socket.onclose = () => {
       setIsConnected(false);
@@ -28,6 +37,7 @@ export const WebSocketProvider = ({ children }) => {
     wsRef.current = socket;
 
     return () => {
+      clearInterval(heartbeatInterval); // Clear the heartbeat interval when the component unmounts
       socket.close();
     };
   }, []);

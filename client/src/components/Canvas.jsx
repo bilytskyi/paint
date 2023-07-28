@@ -58,6 +58,9 @@ const Canvas = () => {
               console.log(users)
               })
               break
+          case "heartbeat":
+            console.log("heartbeat")
+            break
           case "draw":
             if (msg.tool.name === "clear") {
               const ctx = canvasRef.current.getContext('2d')
