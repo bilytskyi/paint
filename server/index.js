@@ -34,7 +34,7 @@ app.ws('/', (ws, req) => {
             case 'draw':
                 broadcastConnection(ws, msg)
                 break
-            case 'draw2':
+            case 'heartbeat':
                 broadcastConnection(ws, msg)
                 break
             case 'init':
