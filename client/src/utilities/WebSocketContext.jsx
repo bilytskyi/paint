@@ -12,7 +12,7 @@ export const WebSocketProvider = ({ children }) => {
   const wsRef = useRef(null);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:5000/");
+    const socket = new WebSocket("ws://16.170.240.78:5000/");
 
     socket.onopen = () => {
       setIsConnected(true);
