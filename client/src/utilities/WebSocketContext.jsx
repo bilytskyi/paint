@@ -1,5 +1,6 @@
 // WebSocketContext.jsx
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useSelector } from 'react-redux';
 
 const WebSocketContext = createContext();
 
@@ -8,6 +9,7 @@ export const useWebSocket = () => {
 };
 
 export const WebSocketProvider = ({ children }) => {
+  const sessionID = useSelector(state => state.canvas.sessionID)
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef(null);
 
@@ -17,7 +19,8 @@ export const WebSocketProvider = ({ children }) => {
     socket.onopen = () => {
       setIsConnected(true);
       socket.send(JSON.stringify({
-        method: "init"
+        method: "init",
+        id: sessionID
       }))
     };
 
@@ -25,7 +28,8 @@ export const WebSocketProvider = ({ children }) => {
       const heartbeatInterval = setInterval(() => {
         if (socket.readyState === socket.OPEN) {
           socket.send(JSON.stringify({
-            method: "heartbeat"
+            method: "heartbeat",
+            id: sessionID
           }));
         }
       }, 30000);
