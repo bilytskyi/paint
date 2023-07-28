@@ -1,12 +1,6 @@
-export default class MyTool {
-    constructor(settings, id, user, websocket) {
-        this.color = settings.color
-        this.stroke = settings.stroke
-        this.width = settings.width
-        this.id = id
+export default class MyMouse {
+    constructor() {
         this.canvas = document.getElementById("canvas")
-        this.socket = websocket
-        this.user = user
         this.destroy()       
     }
 
@@ -15,5 +9,9 @@ export default class MyTool {
         this.canvas.onpointerdown = null
         this.canvas.onpointerup = null
         this.canvas.onpointerout = null
+        this.canvas.onmousemove = null
+        this.canvas.onmousedown = null
+        this.canvas.onmouseup = null
+        this.canvas.onmouseout = null
     }
 }

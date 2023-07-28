@@ -4,10 +4,12 @@ import SettingBar from "./components/SettingBar"
 import Toolbar from "./components/Toolbar";
 import "./styles/app.scss"
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
+import { WebSocketProvider } from "./utilities/WebSocketContext";
 
 function App() {
 
   return (
+    <WebSocketProvider>
     <BrowserRouter>
     <>
     <Routes>
@@ -16,6 +18,7 @@ function App() {
 </Routes>
     </>
     </BrowserRouter>
+    </WebSocketProvider>
   )
 }
 
