@@ -70,22 +70,6 @@ app.ws('/', (ws, req) => {
 //     }
 // })
 
-// for prodaction
-// const _dirname = path.dirname("")
-const buildPath = path.join(__dirname, "../client/dist")
-app.use(express.static(buildPath))
-app.get("/*", (req, res) => {
-    try {
-        res.sendFile(
-            path.join(__dirname, "../client/dist/index.html")
-        )
-    } catch (e) {
-        console.log(e);
-        return res.status(500).json('error');
-    }
-})
-// for prodaction
-
 app.get('/text', (req, res) => {
     try {
         const file = fs.readFileSync(path.resolve(__dirname, 'files', `${req.query.id}.txt`));
@@ -121,6 +105,22 @@ app.get('/users', (req, res) => {
         return res.status(500).json('error');
     }
 })
+
+// for prodaction
+// const _dirname = path.dirname("")
+const buildPath = path.join(__dirname, "../client/dist")
+app.use(express.static(buildPath))
+app.get("/*", (req, res) => {
+    try {
+        res.sendFile(
+            path.join(__dirname, "../client/dist/index.html")
+        )
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json('error');
+    }
+})
+// for prodaction
 
 app.listen(PORT, () => console.log(`server started on PORT ${PORT}`))
 

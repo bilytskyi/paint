@@ -1,8 +1,9 @@
 import MyTool from "./MyTool"
 
 export default class MyCircle extends MyTool {
-    constructor(color, stroke, width, id, canvas, socket) {
-        super(color, stroke, width, id, canvas, socket)
+    constructor(color, stroke, width, id, canvas, socket, user) {
+        super(color, stroke, width, id, canvas, socket, user)
+        this.ctx = this.canvas.getContext('2d')
         this.listen()
     }
 
@@ -10,59 +11,36 @@ export default class MyCircle extends MyTool {
         this.canvas.onpointermove = this.move.bind(this)
         this.canvas.onpointerdown = this.start.bind(this)
         this.canvas.onpointerup = this.end.bind(this)
-        this.canvas.onmousemove = this.move.bind(this)
-        this.canvas.onmousedown = this.start.bind(this)
-        this.canvas.onmouseup = this.end.bind(this)
-        this.canvas.onmouseout = this.end.bind(this)
+        this.canvas.onpointerout = this.end.bind(this)
     }
     
     start(e) {
-        if (e.type === 'touchstart') {
-            this.x = e.touches[0].pageX - this.canvas.offsetLeft
-            this.y = e.touches[0].pageY - this.canvas.offsetTop
-        } else {
-            this.x = e.pageX - this.canvas.offsetLeft
-            this.y = e.pageY - this.canvas.offsetTop
-        }
+        this.x = e.pageX - this.canvas.offsetLeft
+        this.y = e.pageY - this.canvas.offsetTop
         this.is_drawing = true
+        this.ctx.fillStyle = this.color
+        this.ctx.strokeStyle = this.stroke
+        this.ctx.lineWidth = this.width
+        this.ctx.lineCap = "butt"
+        this.ctx.lineJoin = "miter"
         this.saved = this.canvas.toDataURL()
         this.socket.send(JSON.stringify({
-            method: "draw2",
+            method: "users",
             id: this.id,
-            tool: {
-                name: "circle",
-                method: "start",
-                saved: this.saved
-            }
+            user: this.user,
+            state: "start"
         }))
-
         e.preventDefault()
     }
 
     move(e) {
-        if (e.type === 'touchmove') {
-            this.x2 = e.touches[0].pageX - this.canvas.offsetLeft
-            this.y2 = e.touches[0].pageY - this.canvas.offsetTop
-        } else {
+        if (this.is_drawing) {
             this.x2 = e.pageX - this.canvas.offsetLeft
             this.y2 = e.pageY - this.canvas.offsetTop
-        }
-        if (this.is_drawing) {
-            this.r = Math.sqrt((this.x2 - this.x)**2 + (this.y2 - this.y)**2)
-            this.socket.send(JSON.stringify({
-                method: "draw2",
-                id: this.id,
-                tool: {  
-                    name: "circle",
-                    method: "move",
-                    x: this.x,
-                    y: this.y,
-                    r: this.r,
-                    cl: this.color,
-                    st: this.stroke,
-                    wd: this.width
-                }
-            }))
+            this.w = this.x2 - this.x
+            this.h = this.y2 - this.y
+            this.r = Math.sqrt(this.w**2 + this.h**2)
+            this.draw(this.x, this.y, this.r)
         }
         e.preventDefault()
     }
@@ -71,44 +49,54 @@ export default class MyCircle extends MyTool {
         if (this.is_drawing) {
             this.is_drawing = false
             this.socket.send(JSON.stringify({
-                method: "draw2",
+                method: "draw",
                 id: this.id,
                 tool: {
                     name: "circle",
-                    method: "end",
+                    x: this.x,
+                    y: this.y,
+                    r: this.r,
+                    cl: this.color,
+                    st: this.stroke,
+                    wd: this.width,
+                    user: this.user
                 }
+            }))
+
+            this.socket.send(JSON.stringify({
+                method: "users",
+                id: this.id,
+                user: this.user,
+                state: "end"
             }))
         }
         e.preventDefault()
     }
 
-    static start(saved) {
-        localStorage.setItem("circleSaved", saved);
-    }
-
-    static move(ctx, x, y, r, cl, st, wd) {
-        MyCircle.draw(ctx, x, y, r, cl, st, wd)
-    }
-
-    static end(ctx) {
-        ctx.closePath()
+    draw(x, y, r) {
+        const img = new Image()
+        img.src = this.saved
+        img.onload = () => {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+            this.ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height)
+            this.ctx.beginPath()
+            this.ctx.arc(x, y, r, 0, 2 * Math.PI)
+            this.ctx.fill()
+            this.ctx.stroke()
+            this.ctx.closePath()
+        }
     }
 
     static draw(ctx, x, y, r, cl, st, wd) {
-        const img = new Image()
-        img.src = localStorage.getItem("circleSaved")
-        img.onload = () => {
-            ctx.fillStyle = cl
-            ctx.strokeStyle = st
-            ctx.lineWidth = wd
-            ctx.lineCap = "butt"
-            ctx.lineJoin = "miter"
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-            ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height)
-            ctx.beginPath()
-            ctx.arc(x, y, r, 0, 2 * Math.PI)
-            ctx.fill()
-            ctx.stroke()
-        }
+        ctx.fillStyle = cl
+        ctx.strokeStyle = st
+        ctx.lineWidth = wd
+        ctx.lineCap = "butt"
+        ctx.lineJoin = "miter"
+        ctx.beginPath()
+        ctx.arc(x, y, r, 0, 2 * Math.PI)
+        ctx.fill()
+        ctx.stroke()
+        ctx.closePath()
     }
 }

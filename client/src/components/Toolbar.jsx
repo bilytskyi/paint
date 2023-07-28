@@ -17,9 +17,12 @@ import MyRect from '../tools/MyRect';
 import MyCircle from '../tools/MyCircle'
 import MyLine from '../tools/MyLine';
 import MyEraser from '../tools/MyEraser'
+import MyMouse from '../tools/MyMouse';
 import drawFromMemory from '../utilities/DrawFromMemory';
+import { useWebSocket } from '../utilities/WebSocketContext';
 
 const Toolbar = () => {
+  const { websocket, isConnected } = useWebSocket()
   const dispatch = useDispatch();
   // const canvas = useSelector(state => state.canvas.canvas);
   const canvas = document.getElementById("canvas");
@@ -71,19 +74,22 @@ const Toolbar = () => {
           dispatch(setCurrentTool('eraser'))
           break;
       case 'mybrush':
-          new MyBrush(toolsSetting.mybrush, sessionID, userName)
+          new MyBrush(toolsSetting.mybrush, sessionID, userName, websocket)
           break;
       case 'myrect':
-          new MyRect(toolsSetting.myrect, sessionID)
+          new MyRect(toolsSetting.myrect, sessionID, userName, websocket)
           break;
       case 'mycircle':
-          new MyCircle(toolsSetting.mycircle, sessionID)
+          new MyCircle(toolsSetting.mycircle, sessionID, userName, websocket)
           break;
       case 'myline':
-        new MyLine(toolsSetting.myline, sessionID)
+        new MyLine(toolsSetting.myline, sessionID, userName, websocket)
         break;
       case 'myeraser':
-        new MyEraser(toolsSetting.myeraser, sessionID)
+        new MyEraser(toolsSetting.myeraser, sessionID, userName, websocket)
+        break;
+      case 'mymouse':
+        new MyMouse()
         break;
     }
   }, [toolsSetting])
@@ -158,15 +164,13 @@ const Toolbar = () => {
   }
 
   const clear = () => {
-    const ctx = canvas.getContext('2d')
-    ctx.clearRect(0, 0, 1920, 1080)
-  //   socket.send(JSON.stringify({
-  //     method: "draw2",
-  //     id: sessionID,
-  //     tool: {
-  //         name: "clear"
-  //     }
-  // }))
+    websocket.send(JSON.stringify({
+      method: "draw",
+      id: sessionID,
+      tool: {
+        name: "clear"
+      }
+  }))
 
 
   }
@@ -266,15 +270,12 @@ window.addEventListener("click", (e) => {
         parentRef={figuresButtonRef}
         /> */}
 
+        <button onClick={() => {dispatch(setCurrentTool('mymouse'))}}>mouse</button>
         <button onClick={() => {dispatch(setCurrentTool('mybrush'))}}>brush</button>
         <button onClick={() => {dispatch(setCurrentTool('myrect'))}}>rect</button>
         <button onClick={() => {dispatch(setCurrentTool('mycircle'))}}>circle</button>
         <button onClick={() => {dispatch(setCurrentTool('myline'))}}>line</button>
         <button onClick={() => {dispatch(setCurrentTool('myeraser'))}}>eraser</button>
-        <button onClick={() => {console.log(testAction)}}>actions</button>
-        <button onClick={() => {console.log(data)}}>data</button>
-        <button onClick={() => {getSize(canvas)}}>size</button>
-        <button onClick={() => {drawFromMemory(data, canvas)}}>memory</button>
 
         {/* <EraserButton 
         width={iconsSizes[0]} 

@@ -4,7 +4,6 @@ export default class MyBrush extends MyTool {
     constructor(color, stroke, width, id, canvas, socket, user) {
         super(color, stroke, width, id, canvas, socket, user)
         this.ctx = this.canvas.getContext('2d')
-        console.log(this.user)
         this.listen()
     }
 
@@ -12,16 +11,13 @@ export default class MyBrush extends MyTool {
         this.canvas.onpointermove = this.move.bind(this)
         this.canvas.onpointerdown = this.start.bind(this)
         this.canvas.onpointerup = this.end.bind(this)
-        this.canvas.onmousemove = this.move.bind(this)
-        this.canvas.onmousedown = this.start.bind(this)
-        this.canvas.onmouseup = this.end.bind(this)
-        this.canvas.onmouseout = this.end.bind(this)
+        this.canvas.onpointerout = this.end.bind(this)
     }
     
     start(e) {
         this.coordinates = []
-        this.x = Math.round(e.pageX - this.canvas.offsetLeft)
-        this.y = Math.round(e.pageY - this.canvas.offsetTop)
+        this.x = e.pageX - this.canvas.offsetLeft
+        this.y = e.pageY - this.canvas.offsetTop
         this.coordinates.push([this.x, this.y])
         this.is_drawing = true
         this.ctx.beginPath()
@@ -36,32 +32,23 @@ export default class MyBrush extends MyTool {
             method: "users",
             id: this.id,
             user: this.user,
-            state: 'start'
+            state: "start"
         }))
-
         e.preventDefault()
     }
 
     move(e) {
-        this.x = Math.round(e.pageX - this.canvas.offsetLeft)
-        this.y = Math.round(e.pageY - this.canvas.offsetTop)
         if (this.is_drawing) {
+        const newX = e.pageX - this.canvas.offsetLeft
+        const newY = e.pageY - this.canvas.offsetTop
+        const distance = Math.sqrt((newX - this.x) ** 2 + (newY - this.y) ** 2)
+        if (distance > 5) { 
+            this.x = newX
+            this.y = newY
             this.coordinates.push([this.x, this.y])
             this.ctx.lineTo(this.x, this.y)
             this.ctx.stroke()
-            this.socket.send(JSON.stringify({
-                method: "draw2",
-                id: this.id,
-                tool: {
-                    name: "brush",
-                    method: "move",
-                    x: this.x,
-                    y: this.y,
-                    st: this.stroke,
-                    wd: this.width
-                }
-            }))
-        }
+        }}
         e.preventDefault()
     }
 
@@ -70,11 +57,10 @@ export default class MyBrush extends MyTool {
             this.is_drawing = false
             this.ctx.closePath()
             this.socket.send(JSON.stringify({
-                method: "draw2",
+                method: "draw",
                 id: this.id,
                 tool: {
                     name: "brush",
-                    method: "end",
                     xy: this.coordinates,
                     st: this.stroke,
                     wd: this.width,
@@ -86,29 +72,10 @@ export default class MyBrush extends MyTool {
                 method: "users",
                 id: this.id,
                 user: this.user,
-                state: 'end'
+                state: "end"
             }))
         }
         e.preventDefault()
-    }
-
-    static start(ctx, x, y) {
-        ctx.beginPath()
-        ctx.moveTo(x, y)
-    }
-
-    static move(ctx, x, y, st, wd) {
-        ctx.lineTo(x, y)
-        ctx.strokeStyle = st
-        ctx.lineWidth = wd
-        ctx.lineCap = "round"
-        ctx.lineJoin = "round"
-        ctx.stroke()
-    }
-
-    static end(ctx) {
-        ctx.stroke()
-        ctx.closePath()
     }
 
     static draw(ctx, xy, st, wd) {
@@ -124,5 +91,4 @@ export default class MyBrush extends MyTool {
         ctx.stroke()
         ctx.closePath()
     }
-
 }

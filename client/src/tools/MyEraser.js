@@ -1,8 +1,9 @@
 import MyTool from "./MyTool"
 
 export default class MyEraser extends MyTool {
-    constructor(color, stroke, width, id, canvas, socket) {
-        super(color, stroke, width, id, canvas, socket)
+    constructor(color, stroke, width, id, canvas, socket, user) {
+        super(color, stroke, width, id, canvas, socket, user)
+        this.ctx = this.canvas.getContext('2d')
         this.listen()
     }
 
@@ -10,90 +11,84 @@ export default class MyEraser extends MyTool {
         this.canvas.onpointermove = this.move.bind(this)
         this.canvas.onpointerdown = this.start.bind(this)
         this.canvas.onpointerup = this.end.bind(this)
-        this.canvas.onmousemove = this.move.bind(this)
-        this.canvas.onmousedown = this.start.bind(this)
-        this.canvas.onmouseup = this.end.bind(this)
-        this.canvas.onmouseout = this.end.bind(this)
+        this.canvas.onpointerout = this.end.bind(this)
     }
     
     start(e) {
-        if (e.type === 'touchstart') {
-            this.x = e.touches[0].pageX - this.canvas.offsetLeft
-            this.y = e.touches[0].pageY - this.canvas.offsetTop
-        } else {
-            this.x = e.pageX - this.canvas.offsetLeft
-            this.y = e.pageY - this.canvas.offsetTop
-        }
+        this.coordinates = []
+        this.x = e.pageX - this.canvas.offsetLeft
+        this.y = e.pageY - this.canvas.offsetTop
+        this.coordinates.push([this.x, this.y])
         this.is_drawing = true
+        this.ctx.beginPath()
+        this.ctx.strokeStyle = "#ffffff"
+        this.ctx.lineWidth = this.width
+        this.ctx.lineCap = "round"
+        this.ctx.lineJoin = "round"
+        this.ctx.moveTo(this.x, this.y)
+        this.ctx.lineTo(this.x, this.y)
+        this.ctx.stroke()
         this.socket.send(JSON.stringify({
-            method: "draw2",
+            method: "users",
             id: this.id,
-            tool: {
-                name: "eraser",
-                method: "start",
-                x: this.x,
-                y: this.y,
-            }
+            user: this.user,
+            state: "start"
         }))
-
         e.preventDefault()
     }
 
     move(e) {
-        if (e.type === 'touchmove') {
-            this.x = e.touches[0].pageX - this.canvas.offsetLeft
-            this.y = e.touches[0].pageY - this.canvas.offsetTop
-        } else {
-            this.x = e.pageX - this.canvas.offsetLeft
-            this.y = e.pageY - this.canvas.offsetTop
-        }
         if (this.is_drawing) {
-            this.socket.send(JSON.stringify({
-                method: "draw2",
-                id: this.id,
-                tool: {
-                    name: "eraser",
-                    method: "move",
-                    x: this.x,
-                    y: this.y,
-                    wd: this.width
-                }
-            }))
-        }
+        const newX = e.pageX - this.canvas.offsetLeft
+        const newY = e.pageY - this.canvas.offsetTop
+        const distance = Math.sqrt((newX - this.x) ** 2 + (newY - this.y) ** 2)
+        if (distance > 5) { 
+            this.x = newX
+            this.y = newY
+            this.coordinates.push([this.x, this.y])
+            this.ctx.lineTo(this.x, this.y)
+            this.ctx.stroke()
+        }}
         e.preventDefault()
     }
 
     end(e) {
         if (this.is_drawing) {
             this.is_drawing = false
+            this.ctx.closePath()
             this.socket.send(JSON.stringify({
-                method: "draw2",
+                method: "draw",
                 id: this.id,
                 tool: {
                     name: "eraser",
-                    method: "end"
+                    xy: this.coordinates,
+                    st: "#ffffff",
+                    wd: this.width,
+                    user: this.user
                 }
+            }))
+
+            this.socket.send(JSON.stringify({
+                method: "users",
+                id: this.id,
+                user: this.user,
+                state: "end"
             }))
         }
         e.preventDefault()
     }
 
-    static start(ctx, x, y) {
+    static draw(ctx, xy, wd) {
         ctx.beginPath()
-        ctx.moveTo(x, y)
-    }
-
-    static move(ctx, x, y, wd) {
-        ctx.lineTo(x, y)
-        ctx.strokeStyle = "#FFFFFF"
+        ctx.moveTo(xy[0][0], xy[0][1])
+        xy.forEach(el => {
+            ctx.lineTo(el[0], el[1])
+        })
+        ctx.strokeStyle = "#ffffff"
         ctx.lineWidth = wd
         ctx.lineCap = "round"
         ctx.lineJoin = "round"
         ctx.stroke()
-    }
-
-    static stop(ctx) {
         ctx.closePath()
     }
-
 }
