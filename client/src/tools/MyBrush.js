@@ -46,11 +46,9 @@ export default class MyBrush extends MyTool {
         if (distance > 5) { 
             this.x = newX
             this.y = newY
-            // this.ctx.beginPath()
-            // this.ctx.moveTo(this.coordinates.slice(-1)[0], this.coordinates.slice(-1)[1])
+            this.ctx.moveTo(this.coordinates.slice(-1)[0], this.coordinates.slice(-1)[1])
             this.ctx.lineTo(this.x, this.y)
             this.ctx.stroke()
-            // this.ctx.closePath()
             this.coordinates.push([this.x, this.y])
         }}
         e.preventDefault()
@@ -58,6 +56,7 @@ export default class MyBrush extends MyTool {
 
     end(e) {
         if (this.is_drawing) {
+            this.ctx.closePath()
             this.is_drawing = false
             this.socket.send(JSON.stringify({
                 method: "draw",
