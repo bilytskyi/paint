@@ -137,8 +137,9 @@ const Canvas = () => {
       }
 
       setInterval(() => {
-        console.log('TICK!')
+        console.log('FALSE-TICK!')
         if(!isActive) {
+          console.log('TRUE-TICK!')
           for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
             const msg = actionsQueue[indexOfQueue]
             if (msg.tool.user === userName) {
@@ -150,7 +151,7 @@ const Canvas = () => {
               memoryHandler(msg)
             }
           }}
-      }, 1000)
+      }, 1)
 
     }
     
