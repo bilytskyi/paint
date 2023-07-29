@@ -103,18 +103,6 @@ const Canvas = () => {
             handleDrawMessage(msg, actionsQueue)
             // console.log(compressQueue)
             // console.log(JSON.stringify(compressQueue))
-            if(!isActive) {
-            for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
-              const msg = actionsQueue[indexOfQueue]
-              if (msg.tool.user === userName) {
-                console.log('continue')
-                continue
-              } else {
-                console.log('helloo else')
-                drawHandler(msg)
-                memoryHandler(msg)
-              }
-            }}
             break
           // case "users":
           //   console.log(isActive)
@@ -147,6 +135,19 @@ const Canvas = () => {
           //   break
         }
       }
+
+      if(!isActive) {
+        for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
+          const msg = actionsQueue[indexOfQueue]
+          if (msg.tool.user === userName) {
+            console.log('continue')
+            continue
+          } else {
+            console.log('helloo else')
+            drawHandler(msg)
+            memoryHandler(msg)
+          }
+        }}
     }
     
   }, [userName, isConnected])
