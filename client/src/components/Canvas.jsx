@@ -136,18 +136,22 @@ const Canvas = () => {
         }
       }
 
-      if(!isActive) {
-        for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
-          const msg = actionsQueue[indexOfQueue]
-          if (msg.tool.user === userName) {
-            console.log('continue')
-            continue
-          } else {
-            console.log('helloo else')
-            drawHandler(msg)
-            memoryHandler(msg)
-          }
-        }}
+      setInterval(() => {
+        console.log('TICK!')
+        if(!isActive) {
+          for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
+            const msg = actionsQueue[indexOfQueue]
+            if (msg.tool.user === userName) {
+              console.log('continue')
+              continue
+            } else {
+              console.log('helloo else')
+              drawHandler(msg)
+              memoryHandler(msg)
+            }
+          }}
+      }, 1000)
+
     }
     
   }, [userName, isConnected])
