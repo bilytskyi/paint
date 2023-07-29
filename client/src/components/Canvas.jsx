@@ -15,8 +15,8 @@ import MyEraser from '../tools/MyEraser';
 import { useWebSocket } from '../utilities/WebSocketContext';
 
 const Canvas = () => {
-  // const link = '16.170.240.78'
-  const link = 'localhost:5000'
+  const link = '16.170.240.78'
+  // const link = 'localhost:5000'
   const { websocket, isConnected } = useWebSocket()
   const canvasRef = useRef()
   const usernameRef = useRef()
