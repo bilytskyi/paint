@@ -16,8 +16,8 @@ export default class MyBrush extends MyTool {
     
     start(e) {
         this.coordinates = []
-        this.x = e.pageX - this.canvas.offsetLeft
-        this.y = e.pageY - this.canvas.offsetTop
+        this.x = (e.pageX - this.canvas.offsetLeft).toFixed(1)
+        this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
         this.coordinates.push([this.x, this.y])
         this.is_drawing = true
         this.ctx.beginPath()
@@ -39,8 +39,8 @@ export default class MyBrush extends MyTool {
 
     move(e) {
         if (this.is_drawing) {
-        const newX = e.pageX - this.canvas.offsetLeft
-        const newY = e.pageY - this.canvas.offsetTop
+        const newX = (e.pageX - this.canvas.offsetLeft).toFixed(1)
+        const newY = (e.pageY - this.canvas.offsetTop).toFixed(1)
         const distance = Math.sqrt((newX - this.x) ** 2 + (newY - this.y) ** 2)
         if (distance > 5) { 
             this.x = newX

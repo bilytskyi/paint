@@ -15,7 +15,8 @@ import MyEraser from '../tools/MyEraser';
 import { useWebSocket } from '../utilities/WebSocketContext';
 
 const Canvas = () => {
-  const link = '16.170.240.78'
+  // const link = '16.170.240.78'
+  const link = 'localhost:5000'
   const { websocket, isConnected } = useWebSocket()
   const canvasRef = useRef()
   const usernameRef = useRef()
@@ -27,13 +28,14 @@ const Canvas = () => {
   useEffect(() => {
     if (userName && isConnected) {
 
-      axios.post(`http://${link}/users?id=${params.id}`, {user: userName})
+      axios.post(`http://${link}/users?id=${params.id}-users`, {user: userName})
       .then(response => console.log(response.data))
       dispatch(setSessionID(params.id))
 
       const socket = websocket
       let users = {}
-      const actionsQueue = []
+      let actionsQueue = []
+      const compressQueue = []
       let indexOfQueue = 0
 
       socket.send(JSON.stringify({
@@ -47,7 +49,7 @@ const Canvas = () => {
         switch (msg.method) {
           case "connection":
               console.log(`user ${msg.username} join`)
-              axios.get(`http://${link}/users?id=${params.id}`)
+              axios.get(`http://${link}/users?id=${params.id}-users`)
               .then(response => {
                 const usersArray = response.data
                 console.log("Received usersArray:", usersArray)
@@ -55,6 +57,18 @@ const Canvas = () => {
                 acc[user] = "end"
                 return acc
               }, {})
+
+              axios.get(`http://${link}/actions?id=${params.id}-actions`)
+              .then(response => {
+                actionsQueue = JSON.parse(response.data)
+                console.log("Received actionsQueue:", actionsQueue)
+                for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
+                  console.log(indexOfQueue)
+                  const msg = actionsQueue[indexOfQueue]
+                    drawHandler(msg)
+                  }
+              }, {})
+
               console.log(users)
               })
               break
@@ -62,12 +76,10 @@ const Canvas = () => {
             console.log("heartbeat")
             break
           case "draw":
-            if (msg.tool.name === "clear") {
-              const ctx = canvasRef.current.getContext('2d')
-              ctx.clearRect(0, 0, 1920, 1080)
-            } else {
-              actionsQueue.push(msg)
-            }
+            // compressionHandler(msg, compressQueue)
+            handleDrawMessage(msg, actionsQueue)
+            // console.log(compressQueue)
+            // console.log(JSON.stringify(compressQueue))
             break
           case "users":
             const { user, state } = msg;
@@ -77,6 +89,7 @@ const Canvas = () => {
             let filteredMsgs = actionsQueue.filter((msg) => msg.tool && msg.tool.user === userName)
             console.log(filteredMsgs)
             console.log(actionsQueue)
+            console.log(JSON.stringify(actionsQueue))
             console.log(indexOfQueue)
             if(users[userName] === 'start') {
               console.log('AHTUNG')
@@ -101,6 +114,43 @@ const Canvas = () => {
     
   }, [userName, isConnected])
 
+  const handleDrawMessage = async (msg, arr) => {
+    arr.push(msg);
+    try {
+        const response = await axios.post(`http://${link}/actions?id=${params.id}-actions`, {data: JSON.stringify(arr)});
+        console.log(JSON.stringify(arr))
+        console.log(response.data);
+    } catch (error) {
+        console.error("Error while saving actions:", error);
+    }
+}
+
+  // const compressionHandler = (msg, array) => {
+  //   const tool = msg.tool
+  //   console.log(tool.name)
+  //   switch (tool.name) {
+  //     case "brush":
+  //       let chunk = `A,${tool.xy},${tool.st},${tool.wd},${tool.user}`
+  //       array.push(chunk)
+  //       break
+  //     case "rect":
+  //       MyRect.draw(ctx, tool.x, tool.y, tool.w, tool.h, tool.cl, tool.st, tool.wd)
+  //       break
+  //     case "line":
+  //       MyLine.draw(ctx, tool.x, tool.y, tool.x2, tool.y2, tool.st, tool.wd)
+  //       break
+  //     case "circle":
+  //       MyCircle.draw(ctx, tool.x, tool.y, tool.r, tool.cl, tool.st, tool.wd)
+  //       break
+  //     case "eraser":
+  //       MyEraser.draw(ctx, tool.xy, tool.wd)
+  //       break
+  //     case "clear":
+  //       ctx.clearRect(0, 0, 1920, 1080)
+  //       break
+  //   }
+  // }
+
   const drawHandler = (msg) => {
     const ctx = canvasRef.current.getContext('2d')
     const tool = msg.tool
@@ -120,6 +170,9 @@ const Canvas = () => {
         break
       case "eraser":
         MyEraser.draw(ctx, tool.xy, tool.wd)
+        break
+      case "clear":
+        ctx.clearRect(0, 0, 1920, 1080)
         break
     }
   }

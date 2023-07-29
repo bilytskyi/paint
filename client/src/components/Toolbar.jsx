@@ -164,13 +164,21 @@ const Toolbar = () => {
   }
 
   const clear = () => {
+    const ctx = canvas.getContext('2d')
+    ctx.clearRect(0, 0, 1920, 1080)
     websocket.send(JSON.stringify({
       method: "draw",
       id: sessionID,
       tool: {
         name: "clear"
       }
-  }))
+    }))
+    websocket.send(JSON.stringify({
+      method: "users",
+      id: sessionID,
+      user: userName,
+      state: "end"
+    }))
 
 
   }
