@@ -14,8 +14,8 @@ export const WebSocketProvider = ({ children }) => {
   const reconnectIntervalRef = useRef(null);
 
   const connectWebSocket = () => {
-    // const socket = new WebSocket("ws://16.170.240.78:5000/");
-    const socket = new WebSocket("ws://localhost:5000/");
+    const socket = new WebSocket("ws://16.170.240.78:5000/");
+    // const socket = new WebSocket("ws://localhost:5000/");
     socket.onopen = () => {
       console.log('i open socket')
       setIsConnected(true);
