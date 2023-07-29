@@ -28,6 +28,7 @@ export default class MyBrush extends MyTool {
         this.ctx.moveTo(this.x, this.y)
         this.ctx.lineTo(this.x, this.y)
         this.ctx.stroke()
+        this.ctx.closePath()
         this.socket.send(JSON.stringify({
             method: "users",
             id: this.id,
@@ -48,6 +49,7 @@ export default class MyBrush extends MyTool {
             this.coordinates.push([this.x, this.y])
             this.ctx.lineTo(this.x, this.y)
             this.ctx.stroke()
+            this.ctx.closePath()
         }}
         e.preventDefault()
     }
@@ -55,7 +57,6 @@ export default class MyBrush extends MyTool {
     end(e) {
         if (this.is_drawing) {
             this.is_drawing = false
-            this.ctx.closePath()
             this.socket.send(JSON.stringify({
                 method: "draw",
                 id: this.id,
