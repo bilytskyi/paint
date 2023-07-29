@@ -140,9 +140,9 @@ const Canvas = () => {
       }
 
       setInterval(() => {
-        console.log(canDraw)
+        // console.log(canDraw)
         if(canDraw) {
-          console.log(canDraw)
+          // console.log(canDraw)
           for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
             const msg = actionsQueue[indexOfQueue]
             if (msg.tool.user === userName) {

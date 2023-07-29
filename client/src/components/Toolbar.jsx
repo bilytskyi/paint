@@ -242,12 +242,13 @@ window.addEventListener("click", (e) => {
         <button className='toolbar__btn rect' onClick={() => {dispatch(setCurrentTool('rect'))}} />
         <button className='toolbar__btn circle' onClick={() => {dispatch(setCurrentTool('circle'))}} />
         <button className='toolbar__btn eraser' onClick={() => {dispatch(setCurrentTool('eraser'))}} />
-        <button className='toolbar__btn line' onClick={() => {dispatch(setCurrentTool('line'))}} />
-        <input onChange={e => changeColor(e)} type='color' value={color} />
-        <button className='toolbar__btn undo' onClick={() => dispatch(undo(canvas))} />
+        <button className='toolbar__btn line' onClick={() => {dispatch(setCurrentTool('line'))}} /> */}
+        <label style={{margin: 10}} htmlFor='color'>Color</label>
+        <input onChange={e => dispatch(setFillColor({fillColor: e.target.value}))} type='color' value={color} id='color'/>
+        {/* <button className='toolbar__btn undo' onClick={() => dispatch(undo(canvas))} />
         <button className='toolbar__btn redo' onClick={() => dispatch(redo(canvas))} />
         <button className='toolbar__btn save' onClick={() => {download()}} />
-        <button className='toolbar__btn test' onClick={() => {handleHidden()}} />
+        <button className='toolbar__btn test' onClick={() => {handleHidden()}} /> */}
         <label style={{marginLeft: 10}} htmlFor='line-width'>Line width</label>
       <input 
             onChange={e => dispatch(setLineWidth({lineWidth: e.target.value}))}
@@ -258,7 +259,7 @@ window.addEventListener("click", (e) => {
             min={1}
             max={50} />
       <label style={{margin: 10}} htmlFor='stroke-color'>Stroke color</label>
-      <input onChange={e => dispatch(setStrokeColor({strokeColor: e.target.value}))} id='stroke-color' value={stroke} type="color" /> */}
+      <input onChange={e => dispatch(setStrokeColor({strokeColor: e.target.value}))} id='stroke-color' value={stroke} type="color" />
 
         {/* <BrushButton 
         width={iconsSizes[0]} 
