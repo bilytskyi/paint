@@ -106,6 +106,30 @@ app.get('/users', (req, res) => {
     }
 })
 
+app.post('/actions', (req, res) => {
+    try {
+        const data = JSON.stringify(req.body.data); // Convert to JSON format
+        const filePath = path.resolve(__dirname, 'files', `${req.query.id}.txt`);
+        fs.writeFileSync(filePath, data);
+        return res.status(200).json({ message: "Actions saved", data: data });
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json('Error');
+    }
+});
+
+app.get('/actions', (req, res) => {
+    try {
+        const filePath = path.resolve(__dirname, 'files', `${req.query.id}.txt`);
+        const data = fs.readFileSync(filePath, 'utf-8');
+        const actions = JSON.parse(data); // Parse JSON data
+        return res.status(200).json(actions);
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json('Error');
+    }
+});
+
 // for prodaction
 // const _dirname = path.dirname("")
 const buildPath = path.join(__dirname, "../client/dist")

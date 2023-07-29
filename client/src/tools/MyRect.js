@@ -15,8 +15,8 @@ export default class MyRect extends MyTool {
     }
     
     start(e) {
-        this.x = e.pageX - this.canvas.offsetLeft
-        this.y = e.pageY - this.canvas.offsetTop
+        this.x = (e.pageX - this.canvas.offsetLeft).toFixed(1)
+        this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
         this.is_drawing = true
         this.ctx.fillStyle = this.color
         this.ctx.strokeStyle = this.stroke
@@ -35,8 +35,8 @@ export default class MyRect extends MyTool {
 
     move(e) {
         if (this.is_drawing) {
-            this.x2 = e.pageX - this.canvas.offsetLeft
-            this.y2 = e.pageY - this.canvas.offsetTop
+            this.x2 = (e.pageX - this.canvas.offsetLeft).toFixed(1)
+            this.y2 = (e.pageY - this.canvas.offsetTop).toFixed(1)
             this.w = this.x2 - this.x
             this.h = this.y2 - this.y
             this.draw(this.x, this.y, this.w, this.h)

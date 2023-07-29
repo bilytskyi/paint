@@ -1,4 +1,3 @@
-// WebSocketContext.jsx
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useSelector } from 'react-redux';
 
@@ -12,39 +11,58 @@ export const WebSocketProvider = ({ children }) => {
   const sessionID = useSelector(state => state.canvas.sessionID)
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef(null);
+  const reconnectIntervalRef = useRef(null);
 
-  useEffect(() => {
-    const socket = new WebSocket("ws://16.170.240.78:5000/");
-
+  const connectWebSocket = () => {
+    // const socket = new WebSocket("ws://16.170.240.78:5000/");
+    const socket = new WebSocket("ws://localhost:5000/");
     socket.onopen = () => {
+      console.log('i open socket')
       setIsConnected(true);
       socket.send(JSON.stringify({
         method: "init",
         id: sessionID
       }))
+      clearInterval(reconnectIntervalRef.current);
     };
 
-    // Send a heartbeat message every 30 seconds (adjust the interval as needed)
-      const heartbeatInterval = setInterval(() => {
-        if (socket.readyState === socket.OPEN) {
-          socket.send(JSON.stringify({
-            method: "heartbeat",
-            id: sessionID
-          }));
-        }
-      }, 30000);
-
     socket.onclose = () => {
+      console.log('i close socket')
       setIsConnected(false);
+      scheduleReconnect();
     };
 
     wsRef.current = socket;
+  };
+
+  const scheduleReconnect = () => {
+    const reconnectInterval = 3000; // Adjust the interval as needed
+    reconnectIntervalRef.current = setInterval(() => {
+      console.log('Attempting to reconnect...');
+      connectWebSocket();
+    }, reconnectInterval);
+  };
+
+  useEffect(() => {
+    connectWebSocket();
+
+    const heartbeatInterval = setInterval(() => {
+      if (wsRef.current && wsRef.current.readyState === wsRef.current.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          method: "heartbeat",
+          id: sessionID
+        }));
+      }
+    }, 30000);
 
     return () => {
-      clearInterval(heartbeatInterval); // Clear the heartbeat interval when the component unmounts
-      socket.close();
+      clearInterval(heartbeatInterval);
+      clearInterval(reconnectIntervalRef.current);
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
     };
-  }, []);
+  }, [sessionID]);
 
   const value = { websocket: wsRef.current, isConnected };
 
