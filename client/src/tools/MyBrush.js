@@ -46,10 +46,12 @@ export default class MyBrush extends MyTool {
         if (distance > 5) { 
             this.x = newX
             this.y = newY
-            this.coordinates.push([this.x, this.y])
+            // this.ctx.beginPath()
+            // this.ctx.moveTo(this.coordinates.slice(-1)[0], this.coordinates.slice(-1)[1])
             this.ctx.lineTo(this.x, this.y)
             this.ctx.stroke()
-            this.ctx.closePath()
+            // this.ctx.closePath()
+            this.coordinates.push([this.x, this.y])
         }}
         e.preventDefault()
     }
