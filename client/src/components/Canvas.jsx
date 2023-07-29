@@ -259,6 +259,11 @@ const Canvas = () => {
     dispatch(setUserName(usernameRef.current.value))
     setModal(false)
   }
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      connectionHandler();
+    }
+  }
 
   return (
     <div className='canvas' >
@@ -267,7 +272,7 @@ const Canvas = () => {
           <Modal.Title>Enter your name</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <input type='text' ref={usernameRef}/>
+          <input type='text' ref={usernameRef} onKeyDown={handleKeyPress}/>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => connectionHandler()}>
