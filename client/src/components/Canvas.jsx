@@ -24,9 +24,32 @@ const Canvas = () => {
   const params = useParams()
   const dispatch = useDispatch();
   const userName = useSelector(state => state.canvas.username);
+  const [isActive, setIsActive] = useState(false)
+  let isDraw = false
+
+  const start = () => {
+    isDraw = true
+    setIsActive(isDraw)
+    console.log(isDraw)
+  }
+
+  const move = () => {
+    console.log(isDraw)
+  }
+
+  const end = () => {
+    isDraw = false
+    setIsActive(isDraw)
+    console.log(isDraw)
+  }
 
   useEffect(() => {
     if (userName && isConnected) {
+
+      canvasRef.current.addEventListener('pointermove', move);
+      canvasRef.current.addEventListener('pointerdown', start);
+      canvasRef.current.addEventListener('pointerup', end);
+      canvasRef.current.addEventListener('pointerout', end);
 
       axios.post(`http://${link}/users?id=${params.id}-users`, {user: userName})
       .then(response => console.log(response.data))
@@ -80,34 +103,48 @@ const Canvas = () => {
             handleDrawMessage(msg, actionsQueue)
             // console.log(compressQueue)
             // console.log(JSON.stringify(compressQueue))
-            break
-          case "users":
-            const { user, state } = msg;
-          if (state === "start" || state === "end") {
-            users[user] = state;
-            console.log(users);
-            let filteredMsgs = actionsQueue.filter((msg) => msg.tool && msg.tool.user === userName)
-            console.log(filteredMsgs)
-            console.log(actionsQueue)
-            console.log(JSON.stringify(actionsQueue))
-            console.log(indexOfQueue)
-            if(users[userName] === 'start') {
-              console.log('AHTUNG')
-            } else {
-              for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
-                const msg = actionsQueue[indexOfQueue]
-                if (user === userName) {
-                  console.log('continue')
-                  continue
-                } else {
-                  console.log('helloo else')
-                  drawHandler(msg)
-                  memoryHandler(msg)
-                }
+            if(!isActive) {
+            for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
+              const msg = actionsQueue[indexOfQueue]
+              if (msg.tool.user === userName) {
+                console.log('continue')
+                continue
+              } else {
+                console.log('helloo else')
+                drawHandler(msg)
+                memoryHandler(msg)
               }
-            }
-          }
+            }}
             break
+          // case "users":
+          //   console.log(isActive)
+          //   const { user, state } = msg;
+          // if (state === "start" || state === "end") {
+          //   users[user] = state;
+          //   console.log(users);
+          //   let filteredMsgs = actionsQueue.filter((msg) => msg.tool && msg.tool.user === userName)
+          //   console.log(filteredMsgs)
+          //   console.log(actionsQueue)
+          //   console.log(JSON.stringify(actionsQueue))
+          //   console.log(indexOfQueue)
+          //   if(users[userName] === 'start') {
+          //     console.log('AHTUNG')
+          //     console.log(isActive)
+          //   } else {
+          //     for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
+          //       const msg = actionsQueue[indexOfQueue]
+          //       if (user === userName) {
+          //         console.log('continue')
+          //         continue
+          //       } else {
+          //         console.log('helloo else')
+          //         drawHandler(msg)
+          //         memoryHandler(msg)
+          //       }
+          //     }
+          //   }
+          // }
+          //   break
         }
       }
     }
