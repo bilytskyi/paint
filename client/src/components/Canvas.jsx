@@ -24,29 +24,32 @@ const Canvas = () => {
   const params = useParams()
   const dispatch = useDispatch();
   const userName = useSelector(state => state.canvas.username);
-  const [isActive, setIsActive] = useState(false)
-  let isDraw = false
+  // const [canDraw, setCanDraw] = useState(true)
+  // let isDraw = false
 
-  const start = () => {
-    isDraw = true
-    setIsActive(isDraw)
-    console.log(isDraw)
-  }
+  // const start = () => {
+  //   isDraw = true
+  //   setCanDraw(!isDraw)
+  // }
 
-  const move = () => {
-    console.log(isDraw)
-  }
-
-  const end = () => {
-    isDraw = false
-    setIsActive(isDraw)
-    console.log(isDraw)
-  }
+  // const end = () => {
+  //   isDraw = false
+  //   setCanDraw(!isDraw)
+  // }
 
   useEffect(() => {
     if (userName && isConnected) {
 
-      canvasRef.current.addEventListener('pointermove', move);
+      let canDraw = true
+
+      const start = () => {
+        canDraw = false
+      }
+
+      const end = () => {
+        canDraw = true
+      }
+
       canvasRef.current.addEventListener('pointerdown', start);
       canvasRef.current.addEventListener('pointerup', end);
       canvasRef.current.addEventListener('pointerout', end);
@@ -137,9 +140,9 @@ const Canvas = () => {
       }
 
       setInterval(() => {
-        console.log('FALSE-TICK!')
-        if(!isActive) {
-          console.log('TRUE-TICK!')
+        console.log(canDraw)
+        if(canDraw) {
+          console.log(canDraw)
           for (indexOfQueue; indexOfQueue < actionsQueue.length; indexOfQueue++) {
             const msg = actionsQueue[indexOfQueue]
             if (msg.tool.user === userName) {
@@ -151,7 +154,7 @@ const Canvas = () => {
               memoryHandler(msg)
             }
           }}
-      }, 1)
+      }, 1000)
 
     }
     
