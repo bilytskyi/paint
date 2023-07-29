@@ -10,11 +10,11 @@ const toolSlice = createSlice({
             circle: {color: '#ffffff', stroke: '#000000', width: 1},
             eraser: {color: '#ffffff', stroke: '#ffffff', width: 1},
             rect: {color: '#ffffff', stroke: '#000000', width: 1},
-            mybrush: {color: '#10a8ea', stroke: '#10a8ea', width: 12},
-            myrect: {color: 'blue', stroke: 'red', width: 5},
-            mycircle: {color: 'pink', stroke: 'orange', width: 10},
-            myline: {color: 'black', stroke: 'red', width: 1},
-            myeraser: {color: "#FFFFFF", stroke: "#FFFFFF", width: 10},
+            mybrush: {color: '#10a8ea', stroke: '#10a8ea', width: 15},
+            myrect: {color: "#FFFFFF", stroke: '#000000', width: 2},
+            mycircle: {color: "#FFFFFF", stroke: '#000000', width: 2},
+            myline: {color: '#A52A2A', stroke: '#FF0000', width: 2},
+            myeraser: {color: "#FFFFFF", stroke: "#FFFFFF", width: 20},
             mymouse: {color: "#FFFFFF", stroke: "#FFFFFF", width: 10}
         },
         tool: null,
@@ -38,17 +38,17 @@ const toolSlice = createSlice({
             console.log(state.toolsSetting)
             console.log(action)
             switch (state.toolsSetting.currentTool) {
-                case 'line':
-                    state.toolsSetting.line.color = action.payload.fillColor
+                case 'myline':
+                    state.toolsSetting.myline.color = action.payload.fillColor
                     break;
-                case 'circle':
-                    state.toolsSetting.circle.color = action.payload.fillColor
+                case 'mycircle':
+                    state.toolsSetting.my.color = action.payload.fillColor
                     break;
-                case 'rect':
-                    state.toolsSetting.rect.color = action.payload.fillColor
+                case 'myrect':
+                    state.toolsSetting.myrect.color = action.payload.fillColor
                     break;
-                case 'brush':
-                    state.toolsSetting.brush.color = action.payload.fillColor
+                case 'mybrush':
+                    state.toolsSetting.mybrush.color = action.payload.fillColor
                     break;
             }
             // state.tool.fillColor = action.payload.fillColor;
@@ -56,36 +56,36 @@ const toolSlice = createSlice({
         },
         setStrokeColor(state, action) {
             switch (state.toolsSetting.currentTool) {
-                case 'line':
-                    state.toolsSetting.line.stroke = action.payload.strokeColor
+                case 'myline':
+                    state.toolsSetting.myline.stroke = action.payload.strokeColor
                     break;
-                case 'circle':
-                    state.toolsSetting.circle.stroke = action.payload.strokeColor
+                case 'mycircle':
+                    state.toolsSetting.mycircle.stroke = action.payload.strokeColor
                     break;
-                case 'rect':
-                    state.toolsSetting.rect.stroke = action.payload.strokeColor
+                case 'myrect':
+                    state.toolsSetting.myrect.stroke = action.payload.strokeColor
                     break;
-                case 'brush':
-                    state.toolsSetting.brush.stroke = action.payload.strokeColor
+                case 'mybrush':
+                    state.toolsSetting.mybrush.stroke = action.payload.strokeColor
                     break;
             }
         },
         setLineWidth(state, action) {
             switch (state.toolsSetting.currentTool) {
-                case 'line':
-                    state.toolsSetting.line.width = action.payload.lineWidth
+                case 'myline':
+                    state.toolsSetting.myline.width = action.payload.lineWidth
                     break;
-                case 'circle':
-                    state.toolsSetting.circle.width = action.payload.lineWidth
+                case 'mycircle':
+                    state.toolsSetting.mycircle.width = action.payload.lineWidth
                     break;
-                case 'rect':
-                    state.toolsSetting.rect.width = action.payload.lineWidth
+                case 'myrect':
+                    state.toolsSetting.myrect.width = action.payload.lineWidth
                     break;
-                case 'brush':
-                    state.toolsSetting.brush.width = action.payload.lineWidth
+                case 'mybrush':
+                    state.toolsSetting.mybrush.width = action.payload.lineWidth
                     break;
-                case 'eraser':
-                    state.toolsSetting.eraser.width = action.payload.lineWidth
+                case 'myeraser':
+                    state.toolsSetting.myeraser.width = action.payload.lineWidth
                     break;
             }
             // state.tool.lineWidth = action.payload.lineWidth;
