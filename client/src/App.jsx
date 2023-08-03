@@ -5,10 +5,12 @@ import Toolbar from "./components/Toolbar";
 import "./styles/app.scss"
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import { WebSocketProvider } from "./utilities/WebSocketContext";
+import { CanvasesProvider } from "./utilities/CanvasesContext";
 
 function App() {
 
   return (
+    <CanvasesProvider>
     <WebSocketProvider>
     <BrowserRouter>
     <>
@@ -19,6 +21,7 @@ function App() {
     </>
     </BrowserRouter>
     </WebSocketProvider>
+    </CanvasesProvider>
   )
 }
 

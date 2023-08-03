@@ -43,6 +43,9 @@ app.ws('/', (ws, req) => {
             case 'users':
                 broadcastConnection(ws, msg)
                 break
+            case 'update':
+                broadcastConnection(ws, msg)
+                break
         }
     })
 })
@@ -158,5 +161,69 @@ const broadcastConnection = (ws, msg) => {
         if (client.id === msg.id) {
             client.send(JSON.stringify(msg))
         }
+        if (msg.method === 'heartbeat') {
+            // Store or update the active user information in the specific room
+            updateUserActivity(msg.id, msg.user, msg.userid);
+          }
     })
 }
+
+// Define a data structure to store active users in each room
+const activeUsersByRoom = {};
+
+// Function to update or store active user information in a specific room
+const updateUserActivity = (room, user, userid) => {
+  // Ensure the room exists in the data structure
+  if (!activeUsersByRoom[room]) {
+    activeUsersByRoom[room] = {};
+  }
+  // Store the current timestamp as the last active time for the user in the room
+  activeUsersByRoom[room][userid] = {username: user, date: Date.now()};
+};
+
+// Function to check and clean up inactive users and empty rooms
+const cleanupInactiveUsersAndRooms = () => {
+  const now = Date.now();
+  const inactiveThreshold = 60000; // Set your desired threshold (e.g., 1 minute)
+
+  for (const room in activeUsersByRoom) {
+    for (const user in activeUsersByRoom[room]) {
+      if (now - activeUsersByRoom[room][user].date > inactiveThreshold) {
+        // Remove user from the room's active users
+        delete activeUsersByRoom[room][user];
+      }
+    }
+
+    // Check if the room has zero active users
+    if (Object.keys(activeUsersByRoom[room]).length === 0) {
+      // Remove the room if it's empty
+      delete activeUsersByRoom[room];
+    }
+  }
+};
+
+const broadcastConnectionActive = () => {
+    aWss.clients.forEach(client => {
+      // Check if the client is associated with a room
+      if (client.id) {
+        const activeUsersInRoom = activeUsersByRoom[client.id];
+        
+        // Create a message containing active user information for the room
+        const activeUsersMsg = JSON.stringify({
+          method: 'users',
+          id: client.id,
+          users: activeUsersInRoom
+        });
+  
+        // Send the active user information to the client
+        client.send(activeUsersMsg);
+      }
+    });
+  };
+  
+  // Regularly broadcast active user information to clients every 30 seconds
+  setInterval(broadcastConnectionActive, 3000);
+
+
+// Regularly perform cleanup of inactive users and empty rooms
+setInterval(cleanupInactiveUsersAndRooms, 6000); // Adjust the interval as needed
