@@ -7,6 +7,8 @@ const canvasSlice = createSlice({
         undoList: [],
         redoList: [],
         username: '',
+        userId: '',
+        users: null,
         sessionID: null,
         cnv: null,
         testAction: [],
@@ -19,11 +21,26 @@ const canvasSlice = createSlice({
         setSocket(state, action) {
             return action.payload
         },
+        setUsers(state, action) {
+            const equalsCheck = (a, b) => {
+                return JSON.stringify(a) === JSON.stringify(b);
+            }
+            if (state.users === null) {
+                state.users = action.payload
+            } else {
+                if (!equalsCheck(state.users, action.payload)) {
+                    state.users = action.payload
+                }
+            }
+        },
         setCnv(state, action) {
             state.cnv = action.payload;
         },
         setUserName(state, action) {
             state.username = action.payload;
+        },
+        setUserId(state, action) {
+            state.userId = action.payload;
         },
         setSessionID(state, action) {
             state.sessionID = action.payload;
@@ -71,6 +88,6 @@ const canvasSlice = createSlice({
     }
 })
 
-export const {setCanvas, setCnv, setData, pushToUndo, pushToRedo, undo, redo, setUserName, setSocket, setSessionID, setTestAction} = canvasSlice.actions;
+export const {setCanvas, setUsers, setUserId, setCnv, setData, pushToUndo, pushToRedo, undo, redo, setUserName, setSocket, setSessionID, setTestAction} = canvasSlice.actions;
 
 export default canvasSlice.reducer;

@@ -20,9 +20,11 @@ import MyEraser from '../tools/MyEraser'
 import MyMouse from '../tools/MyMouse';
 import drawFromMemory from '../utilities/DrawFromMemory';
 import { useWebSocket } from '../utilities/WebSocketContext';
+import { useCanvases } from "../utilities/CanvasesContext";
 
 const Toolbar = () => {
   const { websocket, isConnected } = useWebSocket()
+  const { canvases, isChange } = useCanvases()
   const dispatch = useDispatch();
   // const canvas = useSelector(state => state.canvas.canvas);
   const canvas = document.getElementById("canvas");
@@ -36,6 +38,8 @@ const Toolbar = () => {
   const width = useSelector(state => state.tool.toolsSetting[currentTool].width)
   const stroke = useSelector(state => state.tool.toolsSetting[currentTool].stroke)
   const testAction = useSelector(state => state.canvas.testAction)
+  const activeUsers = useSelector(state => state.canvas.users)
+  const userId = useSelector(state => state.canvas.userId)
   const deserialize = (data, canvas) => {
     let img = new Image();
     img.onload = () => {
@@ -74,7 +78,7 @@ const Toolbar = () => {
           dispatch(setCurrentTool('eraser'))
           break;
       case 'mybrush':
-          new MyBrush(toolsSetting.mybrush, sessionID, userName, websocket)
+          new MyBrush(toolsSetting.mybrush, sessionID, userName, websocket, userId)
           break;
       case 'myrect':
           new MyRect(toolsSetting.myrect, sessionID, userName, websocket)
@@ -236,6 +240,13 @@ window.addEventListener("click", (e) => {
   }
 })
 
+
+const magic = () => {
+  let hello = canvases[userId].canvas
+  let ctx = canvas.getContext('2d')
+  ctx.drawImage(hello, 0, 0)
+}
+
   return (
     <div className='toolbar' ref={toolbarRef}>
         {/* <button className='toolbar__btn brush' onClick={() => {dispatch(setCurrentTool('brush'))}} />
@@ -285,6 +296,8 @@ window.addEventListener("click", (e) => {
         <button onClick={() => {dispatch(setCurrentTool('mycircle'))}}>circle</button>
         <button onClick={() => {dispatch(setCurrentTool('myline'))}}>line</button>
         <button onClick={() => {dispatch(setCurrentTool('myeraser'))}}>eraser</button>
+        <button onClick={() => {console.log(activeUsers)}}>active</button>
+        <button onClick={() => {magic()}}>magic</button>
 
         {/* <EraserButton 
         width={iconsSizes[0]} 

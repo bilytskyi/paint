@@ -9,6 +9,8 @@ export const useWebSocket = () => {
 
 export const WebSocketProvider = ({ children }) => {
   const sessionID = useSelector(state => state.canvas.sessionID)
+  const userName = useSelector(state => state.canvas.username)
+  const userId = useSelector(state => state.canvas.userId)
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef(null);
   const reconnectIntervalRef = useRef(null);
@@ -21,7 +23,8 @@ export const WebSocketProvider = ({ children }) => {
       setIsConnected(true);
       socket.send(JSON.stringify({
         method: "init",
-        id: sessionID
+        id: sessionID,
+        user: userName
       }))
       clearInterval(reconnectIntervalRef.current);
     };
@@ -50,10 +53,12 @@ export const WebSocketProvider = ({ children }) => {
       if (wsRef.current && wsRef.current.readyState === wsRef.current.OPEN) {
         wsRef.current.send(JSON.stringify({
           method: "heartbeat",
-          id: sessionID
+          id: sessionID,
+          user: userName,
+          userid: userId
         }));
       }
-    }, 30000);
+    }, 5000);
 
     return () => {
       clearInterval(heartbeatInterval);
