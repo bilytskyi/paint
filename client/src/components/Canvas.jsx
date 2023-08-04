@@ -143,11 +143,11 @@ const Canvas = () => {
             MyRect.start(ctx, tool.st, tool.cl, tool.wd)
             break
           case "move":
-            ctx.drawImage(canvasRef.current, 0, 0)
+            // ctx.drawImage(canvasRef.current, 0, 0)
             MyRect.move(ctx, tool.x, tool.y, tool.w, tool.h)
             break
           case "end":
-            // ctx.drawImage(canvasRef.current, 0, 0)
+            ctx.drawImage(canvasRef.current, 0, 0)
             MyRect.end(ctx)
             break
         }
