@@ -35,21 +35,26 @@ export default class MyRect extends MyTool {
 
     move(e) {
         if (this.is_drawing) {
-            this.x2 = (e.pageX - this.canvas.offsetLeft).toFixed(1)
-            this.y2 = (e.pageY - this.canvas.offsetTop).toFixed(1)
-            this.socket.send(JSON.stringify({
-                method: "draw",
-                id: this.id,
-                tool: {  
-                    name: "rect",
-                    method: "move",
-                    x: this.x,
-                    y: this.y,
-                    w: this.x2 - this.x,
-                    h: this.y2 - this.y,
-                    userid: this.userid
-                }
-            }))
+            const newX = (e.pageX - this.canvas.offsetLeft).toFixed(1)
+            const newY = (e.pageY - this.canvas.offsetTop).toFixed(1)
+            const distance = Math.sqrt((newX - this.x) ** 2 + (newY - this.y) ** 2)
+            if (distance > 5) { 
+                this.x2 = newX
+                this.y2 = newY
+                this.socket.send(JSON.stringify({
+                    method: "draw",
+                    id: this.id,
+                    tool: {  
+                        name: "rect",
+                        method: "move",
+                        x: this.x,
+                        y: this.y,
+                        w: this.x2 - this.x,
+                        h: this.y2 - this.y,
+                        userid: this.userid
+                    }
+                }))
+        }
         }
         e.preventDefault()
     }
