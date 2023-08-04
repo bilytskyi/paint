@@ -81,16 +81,16 @@ const Toolbar = () => {
           new MyBrush(toolsSetting.mybrush, sessionID, userName, websocket, userId)
           break;
       case 'myrect':
-          new MyRect(toolsSetting.myrect, sessionID, userName, websocket)
+          new MyRect(toolsSetting.myrect, sessionID, userName, websocket, userId)
           break;
       case 'mycircle':
-          new MyCircle(toolsSetting.mycircle, sessionID, userName, websocket)
+          new MyCircle(toolsSetting.mycircle, sessionID, userName, websocket, userId)
           break;
       case 'myline':
-        new MyLine(toolsSetting.myline, sessionID, userName, websocket)
+        new MyLine(toolsSetting.myline, sessionID, userName, websocket, userId)
         break;
       case 'myeraser':
-        new MyEraser(toolsSetting.myeraser, sessionID, userName, websocket)
+        new MyEraser(toolsSetting.myeraser, sessionID, userName, websocket, userId)
         break;
       case 'mymouse':
         new MyMouse()
