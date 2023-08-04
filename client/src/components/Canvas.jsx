@@ -33,7 +33,7 @@ const Canvas = () => {
     if (userName && isConnected) {
 
       dispatch(setSessionID(params.id))
-
+      let race = Object.keys(canvases)
       const socket = websocket
       socket.send(JSON.stringify({
         id: params.id,
@@ -48,6 +48,11 @@ const Canvas = () => {
               console.log(`user ${msg.username} join, user id: ${userId}`)
               break
           case "draw":
+            const userID = msg.tool.userid
+            let deleteFromArray = race.splice(race.indexOf(userID), 1)
+            race.push(userID)
+            console.log(race)
+            console.log(msg.tool.userid)
             drawHandler(msg)
             break
           case "users":
@@ -61,38 +66,91 @@ const Canvas = () => {
         }
       }
 
-      setInterval(() => {
-        for (let canv of Object.keys(canvases)) {
-          let ctx = canvasRef.current.getContext('2d')
-          ctx.drawImage(canvases[canv].canvas, 0, 0)
+      let lastTimestamp = 0;
+      const targetFrameRate = 60; // Target frame rate in fps
+      const frameInterval = 1000 / targetFrameRate; // Interval in milliseconds
+
+      function drawLoop(timestamp) {
+        // Calculate the time elapsed since the last draw
+        const elapsed = timestamp - lastTimestamp;
+
+        // Only draw if enough time has passed (e.g., 50ms in your original code)
+        if (elapsed >= frameInterval) {
+            lastTimestamp = timestamp;
+
+            let sharedCtx = canvasRef.current.getContext('2d');
+            sharedCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+            for (let canv of race) {
+              let s = canvases[canv].settings
+              // console.log(s)
+              sharedCtx.drawImage(canvases[canv].canvas, s.sX, s.sY, s.sW, s.sH, s.dX, s.dY, s.dW, s.dH)
+            }
         }
-      }, 25)
+
+        // Request the next animation frame
+        requestAnimationFrame(drawLoop);
+      }
+
+      // Start the animation loop
+      requestAnimationFrame(drawLoop);
 
     }
     
   }, [userName, isConnected, isChange])
 
+  const setSettings = (userid, settings) => {
+    canvases[userid].settings = settings
+  }
+
   const drawHandler = (msg) => {
     // const ctx = canvasRef.current.getContext('2d') // delete
     const tool = msg.tool
     const ctx = canvases[tool.userid].canvas.getContext('2d')
-    console.log(tool.name)
     switch (tool.name) {
       case "brush":
         switch (tool.method) {
           case "start":
+            ctx.drawImage(canvasRef.current, 0, 0)
             MyBrush.start(ctx, tool.x, tool.y, tool.st, tool.wd)
             break
           case "move":
+            let settings = {
+              sX: tool.x - 6,
+              sY: tool.y - 6,
+              sW: 12,
+              sH: 12,
+              dX: tool.x - 6,
+              dY: tool.y - 6,
+              dW: 12,
+              dH: 12,
+            }
+            // setSettings(tool.userid, settings)
+            ctx.drawImage(canvasRef.current, 0, 0)
             MyBrush.move(ctx, tool.x, tool.y)
+            console.log(canvases[tool.userid].settings)
             break
           case "end":
+            // ctx.drawImage(canvasRef.current, 0, 0)
             MyBrush.end(ctx)
             break
         }
         break
       case "rect":
-        MyRect.draw(ctx, tool.x, tool.y, tool.w, tool.h, tool.cl, tool.st, tool.wd)
+        switch (tool.method) {
+          case "start":
+            // ctx.drawImage(canvasRef.current, 0, 0)
+            MyRect.start(ctx, tool.st, tool.cl, tool.wd)
+            break
+          case "move":
+            ctx.drawImage(canvasRef.current, 0, 0)
+            MyRect.move(ctx, tool.x, tool.y, tool.w, tool.h)
+            break
+          case "end":
+            // ctx.drawImage(canvasRef.current, 0, 0)
+            MyRect.end(ctx)
+            break
+        }
         break
       case "line":
         MyLine.draw(ctx, tool.x, tool.y, tool.x2, tool.y2, tool.st, tool.wd)
