@@ -28,12 +28,16 @@ const Canvas = () => {
   const dispatch = useDispatch();
   const userName = useSelector(state => state.canvas.username);
   const userId = useSelector(state => state.canvas.userId);
+  const shapes = []
 
   useEffect(() => {
     if (userName && isConnected) {
 
       dispatch(setSessionID(params.id))
       let race = Object.keys(canvases)
+      let race2 = Object.keys(canvases)
+      let deleteFromArray = race2.splice(race2.indexOf(userId), 1)
+      race2.push(userId)
       const socket = websocket
       socket.send(JSON.stringify({
         id: params.id,
@@ -54,6 +58,7 @@ const Canvas = () => {
             console.log(race)
             console.log(msg.tool.userid)
             drawHandler(msg)
+            console.log(shapes)
             break
           case "users":
             const activeUsers = []
@@ -79,13 +84,21 @@ const Canvas = () => {
             lastTimestamp = timestamp;
 
             let sharedCtx = canvasRef.current.getContext('2d');
+            // const clientCtx = canvases[userId].canvas.getContext('2d')
             sharedCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
+            // for (let shape of shapes) {
+            //   drawShapes(shape, sharedCtx)
+            // }
+            
             for (let canv of race) {
-              let s = canvases[canv].settings
-              // console.log(s)
-              sharedCtx.drawImage(canvases[canv].canvas, s.sX, s.sY, s.sW, s.sH, s.dX, s.dY, s.dW, s.dH)
+              sharedCtx.drawImage(canvases[canv].canvas, 0, 0)
             }
+
+            // for (let shape of shapes) {
+            //   drawShapes(shape, sharedCtx)
+            // }
+
         }
 
         // Request the next animation frame
@@ -103,6 +116,18 @@ const Canvas = () => {
     canvases[userid].settings = settings
   }
 
+  const drawShapes = (shape, ctx) => {
+    const name = shape.name
+    switch (name) {
+      case "brush":
+        MyBrush.draw(ctx, shape.xy, shape.st, shape.wd)
+        break
+      case "rect":
+        MyRect.draw(ctx, shape.x, shape.y, shape.w, shape.h, shape.st, shape.wd, shape.cl)
+        break
+    }
+  }
+
   const drawHandler = (msg) => {
     // const ctx = canvasRef.current.getContext('2d') // delete
     const tool = msg.tool
@@ -111,7 +136,9 @@ const Canvas = () => {
       case "brush":
         switch (tool.method) {
           case "start":
-            ctx.drawImage(canvasRef.current, 0, 0)
+            for (let shape of shapes) {
+              drawShapes(shape, ctx)
+            }
             MyBrush.start(ctx, tool.x, tool.y, tool.st, tool.wd)
             break
           case "move":
@@ -126,20 +153,22 @@ const Canvas = () => {
               dH: 12,
             }
             // setSettings(tool.userid, settings)
-            ctx.drawImage(canvasRef.current, 0, 0)
+            // ctx.drawImage(canvasRef.current, 0, 0)
             MyBrush.move(ctx, tool.x, tool.y)
-            console.log(canvases[tool.userid].settings)
             break
           case "end":
             // ctx.drawImage(canvasRef.current, 0, 0)
             MyBrush.end(ctx)
+            shapes.push(tool)
             break
         }
         break
       case "rect":
         switch (tool.method) {
           case "start":
-            // ctx.drawImage(canvasRef.current, 0, 0)
+            for (let shape of shapes) {
+              drawShapes(shape, ctx)
+            }
             MyRect.start(ctx, tool.st, tool.cl, tool.wd)
             break
           case "move":
@@ -147,8 +176,9 @@ const Canvas = () => {
             MyRect.move(ctx, tool.x, tool.y, tool.w, tool.h)
             break
           case "end":
-            ctx.drawImage(canvasRef.current, 0, 0)
+            // ctx.drawImage(canvasRef.current, 0, 0)
             MyRect.end(ctx)
+            shapes.push(tool)
             break
         }
         break

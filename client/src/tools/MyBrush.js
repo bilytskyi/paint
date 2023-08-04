@@ -17,6 +17,8 @@ export default class MyBrush extends MyTool {
         this.x = (e.pageX - this.canvas.offsetLeft).toFixed(1)
         this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
         this.is_drawing = true
+        this.xy = []
+        this.xy.push([this.x, this.y])
         this.socket.send(JSON.stringify({
             method: "draw",
             id: this.id,
@@ -41,6 +43,7 @@ export default class MyBrush extends MyTool {
         if (distance > 5) { 
             this.x = newX
             this.y = newY
+            this.xy.push([this.x, this.y])
             this.socket.send(JSON.stringify({
                 method: "draw",
                 id: this.id,
@@ -65,7 +68,11 @@ export default class MyBrush extends MyTool {
                 tool: {
                     name: "brush",
                     method: "end",
-                    userid: this.userid
+                    userid: this.userid,
+                    xy: this.xy,
+                    st: this.stroke,
+                    wd: this.width
+
                 }
             }))
         }
@@ -89,6 +96,20 @@ export default class MyBrush extends MyTool {
     }
 
     static end(ctx) {
+        ctx.closePath()
+    }
+
+    static draw(ctx, xy, st, wd) {
+        ctx.beginPath()
+        ctx.strokeStyle = st
+        ctx.lineWidth = wd
+        ctx.lineCap = "round"
+        ctx.lineJoin = "round"
+        ctx.moveTo(xy[0][0], xy[0][1])
+        xy.forEach(coor => {
+            ctx.lineTo(coor[0], coor[1])
+        })
+        ctx.stroke()
         ctx.closePath()
     }
 }

@@ -68,7 +68,14 @@ export default class MyRect extends MyTool {
                 tool: {
                     name: "rect",
                     method: "end",
-                    userid: this.userid
+                    userid: this.userid,
+                    cl: this.color,
+                    st: this.stroke,
+                    wd: this.width,
+                    x: this.x,
+                    y: this.y,
+                    w: this.x2 - this.x,
+                    h: this.y2 - this.y
                 }
             }))
         }
@@ -99,6 +106,19 @@ export default class MyRect extends MyTool {
     }
 
     static end(ctx) {
+        ctx.closePath()
+    }
+
+    static draw(ctx, x, y, w, h, st, wd, cl) {
+        ctx.beginPath()
+        ctx.fillStyle = cl
+        ctx.strokeStyle = st
+        ctx.lineWidth = wd
+        ctx.lineCap = "butt"
+        ctx.lineJoin = "miter"
+        ctx.rect(x, y, w, h)
+        ctx.fill()
+        ctx.stroke()
         ctx.closePath()
     }
 
