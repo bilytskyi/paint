@@ -87,9 +87,9 @@ const Canvas = () => {
             // const clientCtx = canvases[userId].canvas.getContext('2d')
             sharedCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-            // for (let shape of shapes) {
-            //   drawShapes(shape, sharedCtx)
-            // }
+            for (let shape of shapes) {
+              drawShapes(shape, sharedCtx)
+            }
             
             for (let canv of race) {
               sharedCtx.drawImage(canvases[canv].canvas, 0, 0)
@@ -160,6 +160,9 @@ const Canvas = () => {
             // ctx.drawImage(canvasRef.current, 0, 0)
             MyBrush.end(ctx)
             shapes.push(tool)
+            for (let shape of shapes) {
+              drawShapes(shape, ctx)
+            }
             break
         }
         break
@@ -179,6 +182,9 @@ const Canvas = () => {
             // ctx.drawImage(canvasRef.current, 0, 0)
             MyRect.end(ctx)
             shapes.push(tool)
+            for (let shape of shapes) {
+              drawShapes(shape, ctx)
+            }
             break
         }
         break
