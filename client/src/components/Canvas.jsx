@@ -13,14 +13,15 @@ import MyCircle from '../tools/MyCircle'
 import MyLine from '../tools/MyLine';
 import MyEraser from '../tools/MyEraser';
 import { useWebSocket } from '../utilities/WebSocketContext';
-import { useCanvases } from "../utilities/CanvasesContext";
-import pako from 'pako';
+// import { useCanvases } from "../utilities/CanvasesContext";
+import DrawMessagesHandler from "../utilities/DrawMessagesHandler";
+import LogsHandler from "../utilities/LogsHandler";
 
 const Canvas = () => {
   // const link = '16.170.240.78'
   const link = 'localhost:5000'
   const { websocket, isConnected } = useWebSocket()
-  const { canvases, isChange } = useCanvases()
+  // const { canvases, isChange } = useCanvases()
   const canvasRef = useRef()
   const usernameRef = useRef()
   const [modal, setModal] = useState(true)
@@ -32,12 +33,19 @@ const Canvas = () => {
 
   useEffect(() => {
     if (userName && isConnected) {
-
+      const offCanvas = document.createElement('canvas')
+      offCanvas.width = 1920
+      offCanvas.height = 1080
+      const offCtx = offCanvas.getContext("2d")
+      const figures = {}
+      const logs = []
+      const users = {}
+      users[userId] = {
+        name: userName,
+        prev: null,
+        progress: 0
+      }
       dispatch(setSessionID(params.id))
-      let race = Object.keys(canvases)
-      let race2 = Object.keys(canvases)
-      let deleteFromArray = race2.splice(race2.indexOf(userId), 1)
-      race2.push(userId)
       const socket = websocket
       socket.send(JSON.stringify({
         id: params.id,
@@ -45,72 +53,141 @@ const Canvas = () => {
         method: 'connection'
       }))
 
-      socket.onmessage = (event) => {
+      socket.onmessage = async (event) => {
         let msg = JSON.parse(event.data)
         switch (msg.method) {
           case "connection":
               console.log(`user ${msg.username} join, user id: ${userId}`)
               break
           case "draw":
-            const userID = msg.tool.userid
-            let deleteFromArray = race.splice(race.indexOf(userID), 1)
-            race.push(userID)
-            console.log(race)
-            console.log(msg.tool.userid)
-            drawHandler(msg)
-            console.log(shapes)
+            DrawMessagesHandler(msg, figures, logs)
             break
           case "users":
-            const activeUsers = []
+            const activeUsers = {}
             for (let user of Object.keys(msg.users)) {
-              activeUsers.push([user, msg.users[user].username])
+              if (!activeUsers[user]) {
+                activeUsers[user] = {
+                  name: msg.users[user].username, 
+                  prev: null,
+                  progress: 0
+                }
+              }
             }
             dispatch(setUsers(activeUsers))
-            console.log(canvases)
             break
         }
       }
 
       let lastTimestamp = 0;
-      const targetFrameRate = 60; // Target frame rate in fps
-      const frameInterval = 1000 / targetFrameRate; // Interval in milliseconds
+      const targetFrameRate = 60; 
+      const frameInterval = 1000 / targetFrameRate; 
 
       function drawLoop(timestamp) {
-        // Calculate the time elapsed since the last draw
+        
         const elapsed = timestamp - lastTimestamp;
 
-        // Only draw if enough time has passed (e.g., 50ms in your original code)
+        
         if (elapsed >= frameInterval) {
             lastTimestamp = timestamp;
 
             let sharedCtx = canvasRef.current.getContext('2d');
-            // const clientCtx = canvases[userId].canvas.getContext('2d')
-            sharedCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
-            for (let shape of shapes) {
-              drawShapes(shape, sharedCtx)
-            }
-            
-            for (let canv of race) {
-              sharedCtx.drawImage(canvases[canv].canvas, 0, 0)
-            }
-
-            // for (let shape of shapes) {
-            //   drawShapes(shape, sharedCtx)
-            // }
+            LogsHandler(logs, figures, users, offCtx)
+            sharedCtx.drawImage(offCanvas, 0, 0)
 
         }
 
-        // Request the next animation frame
+        
         requestAnimationFrame(drawLoop);
       }
 
-      // Start the animation loop
+      
       requestAnimationFrame(drawLoop);
 
     }
     
-  }, [userName, isConnected, isChange])
+  }, [userName, isConnected])
+
+  // useEffect(() => {
+  //   if (userName && isConnected) {
+
+  //     dispatch(setSessionID(params.id))
+  //     let race = Object.keys(canvases)
+  //     let race2 = Object.keys(canvases)
+  //     let deleteFromArray = race2.splice(race2.indexOf(userId), 1)
+  //     race2.push(userId)
+  //     const socket = websocket
+  //     socket.send(JSON.stringify({
+  //       id: params.id,
+  //       username: userName,
+  //       method: 'connection'
+  //     }))
+
+  //     socket.onmessage = (event) => {
+  //       let msg = JSON.parse(event.data)
+  //       switch (msg.method) {
+  //         case "connection":
+  //             console.log(`user ${msg.username} join, user id: ${userId}`)
+  //             break
+  //         case "draw":
+  //           const userID = msg.tool.userid
+  //           let deleteFromArray = race.splice(race.indexOf(userID), 1)
+  //           race.push(userID)
+  //           console.log(race)
+  //           console.log(msg.tool.userid)
+  //           drawHandler(msg)
+  //           console.log(shapes)
+  //           break
+  //         case "users":
+  //           const activeUsers = []
+  //           for (let user of Object.keys(msg.users)) {
+  //             activeUsers.push([user, msg.users[user].username])
+  //           }
+  //           dispatch(setUsers(activeUsers))
+  //           console.log(canvases)
+  //           break
+  //       }
+  //     }
+
+  //     let lastTimestamp = 0;
+  //     const targetFrameRate = 60; // Target frame rate in fps
+  //     const frameInterval = 1000 / targetFrameRate; // Interval in milliseconds
+
+  //     function drawLoop(timestamp) {
+  //       // Calculate the time elapsed since the last draw
+  //       const elapsed = timestamp - lastTimestamp;
+
+  //       // Only draw if enough time has passed (e.g., 50ms in your original code)
+  //       if (elapsed >= frameInterval) {
+  //           lastTimestamp = timestamp;
+
+  //           let sharedCtx = canvasRef.current.getContext('2d');
+  //           // const clientCtx = canvases[userId].canvas.getContext('2d')
+  //           sharedCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+  //           for (let shape of shapes) {
+  //             drawShapes(shape, sharedCtx)
+  //           }
+            
+  //           for (let canv of race) {
+  //             sharedCtx.drawImage(canvases[canv].canvas, 0, 0)
+  //           }
+
+  //           // for (let shape of shapes) {
+  //           //   drawShapes(shape, sharedCtx)
+  //           // }
+
+  //       }
+
+  //       // Request the next animation frame
+  //       requestAnimationFrame(drawLoop);
+  //     }
+
+  //     // Start the animation loop
+  //     requestAnimationFrame(drawLoop);
+
+  //   }
+    
+  // }, [userName, isConnected, isChange])
 
   const setSettings = (userid, settings) => {
     canvases[userid].settings = settings

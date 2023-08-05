@@ -17,19 +17,21 @@ export default class MyBrush extends MyTool {
         this.x = (e.pageX - this.canvas.offsetLeft).toFixed(1)
         this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
         this.is_drawing = true
-        this.xy = []
-        this.xy.push([this.x, this.y])
+        this.curr = [this.x, this.y]
+        this.prev = null
+        this.figureid = `${(+new Date()).toString(16)}`
         this.socket.send(JSON.stringify({
             method: "draw",
             id: this.id,
             tool: {
                 name: "brush",
                 method: "start",
-                x: this.x,
-                y: this.y,
+                curr: this.curr,
+                prev: this.prev,
                 st: this.stroke,
                 wd: this.width,
-                userid: this.userid
+                userid: this.userid,
+                figureid: this.figureid
             }
         }))
         e.preventDefault()
@@ -41,18 +43,20 @@ export default class MyBrush extends MyTool {
         const newY = (e.pageY - this.canvas.offsetTop).toFixed(1)
         const distance = Math.sqrt((newX - this.x) ** 2 + (newY - this.y) ** 2)
         if (distance > 5) { 
+            this.prev = [this.x, this.y]
             this.x = newX
             this.y = newY
-            this.xy.push([this.x, this.y])
+            this.curr = [this.x, this.y]
             this.socket.send(JSON.stringify({
                 method: "draw",
                 id: this.id,
                 tool: {
                     name: "brush",
                     method: "move",
-                    x: this.x,
-                    y: this.y,
-                    userid: this.userid
+                    curr: this.curr,
+                    prev: this.prev,
+                    userid: this.userid,
+                    figureid: this.figureid
                 }
             }))
         }}
@@ -69,9 +73,9 @@ export default class MyBrush extends MyTool {
                     name: "brush",
                     method: "end",
                     userid: this.userid,
-                    xy: this.xy,
                     st: this.stroke,
-                    wd: this.width
+                    wd: this.width,
+                    figureid: this.figureid
 
                 }
             }))
