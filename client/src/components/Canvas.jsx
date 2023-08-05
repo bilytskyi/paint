@@ -91,7 +91,9 @@ const Canvas = () => {
             lastTimestamp = timestamp;
 
             let sharedCtx = canvasRef.current.getContext('2d');
-            LogsHandler(logs, figures, users, offCtx)
+            // sharedCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            // offCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            LogsHandler(logs.slice(-100), figures, users, offCtx)
             sharedCtx.drawImage(offCanvas, 0, 0)
 
         }
