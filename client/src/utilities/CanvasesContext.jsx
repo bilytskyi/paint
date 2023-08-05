@@ -8,7 +8,7 @@ export const useCanvases = () => {
 };
 
 export const CanvasesProvider = ({ children }) => {
-  const activeUsers = useSelector(state => state.canvas.users);
+  // const activeUsers = useSelector(state => state.canvas.users);
   const [isChange, setIsChange] = useState(false);
   
   const initialSettings = {

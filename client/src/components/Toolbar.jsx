@@ -20,11 +20,11 @@ import MyEraser from '../tools/MyEraser'
 import MyMouse from '../tools/MyMouse';
 import drawFromMemory from '../utilities/DrawFromMemory';
 import { useWebSocket } from '../utilities/WebSocketContext';
-import { useCanvases } from "../utilities/CanvasesContext";
+// import { useCanvases } from "../utilities/CanvasesContext";
 
 const Toolbar = () => {
   const { websocket, isConnected } = useWebSocket()
-  const { canvases, isChange } = useCanvases()
+  // const { canvases, isChange } = useCanvases()
   const dispatch = useDispatch();
   // const canvas = useSelector(state => state.canvas.canvas);
   const canvas = document.getElementById("canvas");
@@ -241,11 +241,11 @@ window.addEventListener("click", (e) => {
 })
 
 
-const magic = () => {
-  let hello = canvases[userId].canvas
-  let ctx = canvas.getContext('2d')
-  ctx.drawImage(hello, 0, 0)
-}
+// const magic = () => {
+//   let hello = canvases[userId].canvas
+//   let ctx = canvas.getContext('2d')
+//   ctx.drawImage(hello, 0, 0)
+// }
 
   return (
     <div className='toolbar' ref={toolbarRef}>

@@ -10,7 +10,7 @@ import { CanvasesProvider } from "./utilities/CanvasesContext";
 function App() {
 
   return (
-    <CanvasesProvider>
+    // <CanvasesProvider>
     <WebSocketProvider>
     <BrowserRouter>
     <>
@@ -21,7 +21,7 @@ function App() {
     </>
     </BrowserRouter>
     </WebSocketProvider>
-    </CanvasesProvider>
+    // </CanvasesProvider>
   )
 }
 
