@@ -67,7 +67,7 @@ const Canvas = () => {
               break
           case "draw":
             DrawMessagesHandler(msg, figures, logs, canvases)
-            console.log(Object.keys(canvases).length)
+            console.log(logs.length)
             break
           case "users":
             for (let user of Object.keys(msg.users)) {
@@ -96,6 +96,10 @@ const Canvas = () => {
 
             let sharedCtx = canvasRef.current.getContext('2d');
             sharedCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+            sharedCtx.fillStyle = "#ffffff"
+            sharedCtx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+
             // offCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
             LogsHandler(logs.slice(-100), figures, users, offCtx)
             for (let canvas of Object.keys(canvases)) {

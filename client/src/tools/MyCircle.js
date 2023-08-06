@@ -1,9 +1,8 @@
 import MyTool from "./MyTool"
 
 export default class MyCircle extends MyTool {
-    constructor(color, stroke, width, id, canvas, socket, user) {
-        super(color, stroke, width, id, canvas, socket, user)
-        this.ctx = this.canvas.getContext('2d')
+    constructor(color, stroke, width, id, canvas, socket, user, userid) {
+        super(color, stroke, width, id, canvas, socket, user, userid)
         this.listen()
     }
 
@@ -17,30 +16,50 @@ export default class MyCircle extends MyTool {
     start(e) {
         this.x = (e.pageX - this.canvas.offsetLeft).toFixed(1)
         this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
+        this.r = 0
         this.is_drawing = true
-        this.ctx.fillStyle = this.color
-        this.ctx.strokeStyle = this.stroke
-        this.ctx.lineWidth = this.width
-        this.ctx.lineCap = "butt"
-        this.ctx.lineJoin = "miter"
-        this.saved = this.canvas.toDataURL()
+        this.figureid = `${(+new Date()).toString(16)}`
         this.socket.send(JSON.stringify({
-            method: "users",
+            method: "draw",
             id: this.id,
-            user: this.user,
-            state: "start"
+            tool: {
+                name: "circle",
+                method: "start",
+                userid: this.userid,
+                cl: this.color,
+                st: this.stroke,
+                wd: this.width,
+                figureid: this.figureid,
+            }
         }))
         e.preventDefault()
     }
 
     move(e) {
         if (this.is_drawing) {
-            this.x2 = (e.pageX - this.canvas.offsetLeft).toFixed(1)
-            this.y2 = (e.pageY - this.canvas.offsetTop).toFixed(1)
-            this.w = this.x2 - this.x
-            this.h = this.y2 - this.y
-            this.r = (Math.sqrt(this.w**2 + this.h**2)).toFixed(1)
-            this.draw(this.x, this.y, this.r)
+            const newX = (e.pageX - this.canvas.offsetLeft).toFixed(1)
+            const newY = (e.pageY - this.canvas.offsetTop).toFixed(1)
+            const distance = Math.sqrt((newX - this.x) ** 2 + (newY - this.y) ** 2)
+            if (distance > 5) { 
+                this.x2 = newX
+                this.y2 = newY
+                this.w = this.x2 - this.x
+                this.h = this.y2 - this.y
+                this.r = (Math.sqrt(this.w**2 + this.h**2)).toFixed(1)
+                this.socket.send(JSON.stringify({
+                    method: "draw",
+                    id: this.id,
+                    tool: {  
+                        name: "circle",
+                        method: "move",
+                        x: this.x,
+                        y: this.y,
+                        r: this.r,
+                        userid: this.userid,
+                        figureid: this.figureid
+                    }
+                }))
+        }
         }
         e.preventDefault()
     }
@@ -53,47 +72,51 @@ export default class MyCircle extends MyTool {
                 id: this.id,
                 tool: {
                     name: "circle",
-                    x: this.x,
-                    y: this.y,
-                    r: this.r,
+                    method: "end",
+                    userid: this.userid,
                     cl: this.color,
                     st: this.stroke,
                     wd: this.width,
-                    user: this.user
+                    x: this.x,
+                    y: this.y,
+                    r: this.r,
+                    figureid: this.figureid
+                    
                 }
-            }))
-
-            this.socket.send(JSON.stringify({
-                method: "users",
-                id: this.id,
-                user: this.user,
-                state: "end"
             }))
         }
         e.preventDefault()
     }
 
-    draw(x, y, r) {
-        const img = new Image()
-        img.src = this.saved
-        img.onload = () => {
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-            this.ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height)
-            this.ctx.beginPath()
-            this.ctx.arc(x, y, r, 0, 2 * Math.PI)
-            this.ctx.fill()
-            this.ctx.stroke()
-            this.ctx.closePath()
-        }
-    }
-
-    static draw(ctx, x, y, r, cl, st, wd) {
+    static start(ctx, st, cl, wd) {
+        ctx.beginPath()
         ctx.fillStyle = cl
         ctx.strokeStyle = st
         ctx.lineWidth = wd
         ctx.lineCap = "butt"
         ctx.lineJoin = "miter"
+    }
+
+    static move(ctx, x, y, r) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         ctx.beginPath()
+        ctx.arc(x, y, r, 0, 2 * Math.PI)
+        ctx.fill()
+        ctx.stroke()
+        ctx.closePath()
+    }
+
+    static end(ctx) {
+        ctx.closePath()
+    }
+
+    static draw(ctx, x, y, r, st, wd, cl) {
+        ctx.beginPath()
+        ctx.fillStyle = cl
+        ctx.strokeStyle = st
+        ctx.lineWidth = wd
+        ctx.lineCap = "butt"
+        ctx.lineJoin = "miter"
         ctx.arc(x, y, r, 0, 2 * Math.PI)
         ctx.fill()
         ctx.stroke()

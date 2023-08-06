@@ -16,6 +16,8 @@ export default class MyRect extends MyTool {
     start(e) {
         this.x = (e.pageX - this.canvas.offsetLeft).toFixed(1)
         this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
+        this.w = 0
+        this.h = 0
         this.is_drawing = true
         this.figureid = `${(+new Date()).toString(16)}`
         this.socket.send(JSON.stringify({
@@ -42,6 +44,8 @@ export default class MyRect extends MyTool {
             if (distance > 5) { 
                 this.x2 = newX
                 this.y2 = newY
+                this.w = this.x2 - this.x
+                this.h = this.y2 - this.y
                 this.socket.send(JSON.stringify({
                     method: "draw",
                     id: this.id,
@@ -50,8 +54,8 @@ export default class MyRect extends MyTool {
                         method: "move",
                         x: this.x,
                         y: this.y,
-                        w: this.x2 - this.x,
-                        h: this.y2 - this.y,
+                        w: this.w,
+                        h: this.h,
                         userid: this.userid,
                         figureid: this.figureid
                     }
@@ -76,8 +80,8 @@ export default class MyRect extends MyTool {
                     wd: this.width,
                     x: this.x,
                     y: this.y,
-                    w: this.x2 - this.x,
-                    h: this.y2 - this.y,
+                    w: this.w,
+                    h: this.h,
                     figureid: this.figureid
                     
                 }

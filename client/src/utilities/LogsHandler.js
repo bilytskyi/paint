@@ -1,3 +1,5 @@
+import MyCircle from "../tools/MyCircle"
+import MyLine from "../tools/MyLine"
 import MyRect from "../tools/MyRect"
 import DrawBrushHandler from "./DrawBrushHandler"
 
@@ -20,6 +22,32 @@ const LogsHandler = (logs, figures, users, ctx) => {
                     log.settings.width,
                     log.settings.color
                 )
+                break
+            case "circle":
+                MyCircle.draw(
+                    ctx,
+                    log.settings.data[0],
+                    log.settings.data[1],
+                    log.settings.data[2],
+                    log.settings.stroke,
+                    log.settings.width,
+                    log.settings.color
+                )
+                break
+            case "line":
+                MyLine.draw(
+                    ctx,
+                    log.settings.data[0],
+                    log.settings.data[1],
+                    log.settings.data[2],
+                    log.settings.data[3],
+                    log.settings.stroke,
+                    log.settings.width
+                )
+                break
+            case "eraser":
+                DrawBrushHandler(ctx, figure.settings, log.curr, log.prev)
+                break
 
         }
     }
