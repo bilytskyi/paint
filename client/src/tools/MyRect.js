@@ -18,6 +18,7 @@ export default class MyRect extends MyTool {
         this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
         this.is_drawing = true
         localStorage.setItem("rectSaved", this.canvas.toDataURL())
+        this.figureid = `${(+new Date()).toString(16)}`
         this.socket.send(JSON.stringify({
             method: "draw",
             id: this.id,
@@ -27,7 +28,8 @@ export default class MyRect extends MyTool {
                 userid: this.userid,
                 cl: this.color,
                 st: this.stroke,
-                wd: this.width
+                wd: this.width,
+                figureid: this.figureid
             }
         }))
         e.preventDefault()
@@ -51,7 +53,8 @@ export default class MyRect extends MyTool {
                         y: this.y,
                         w: this.x2 - this.x,
                         h: this.y2 - this.y,
-                        userid: this.userid
+                        userid: this.userid,
+                        figureid: this.figureid
                     }
                 }))
         }
@@ -76,6 +79,7 @@ export default class MyRect extends MyTool {
                     y: this.y,
                     w: this.x2 - this.x,
                     h: this.y2 - this.y,
+                    figureid: this.figureid
                     
                 }
             }))

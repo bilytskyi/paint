@@ -99,10 +99,10 @@ const Canvas = () => {
             let sharedCtx = canvasRef.current.getContext('2d');
             sharedCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
             // offCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-            LogsHandler(logs.slice(-100), figures, users, offCtx)
             for (let canvas of Object.keys(canvases)) {
               sharedCtx.drawImage(canvases[canvas], 0, 0)
             }
+            LogsHandler(logs.slice(-100), figures, users, offCtx)
         }
 
         
