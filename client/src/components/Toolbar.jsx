@@ -296,8 +296,6 @@ window.addEventListener("click", (e) => {
         <button onClick={() => {dispatch(setCurrentTool('mycircle'))}}>circle</button>
         <button onClick={() => {dispatch(setCurrentTool('myline'))}}>line</button>
         <button onClick={() => {dispatch(setCurrentTool('myeraser'))}}>eraser</button>
-        <button onClick={() => {console.log(activeUsers)}}>active</button>
-        <button onClick={() => {magic()}}>magic</button>
 
         {/* <EraserButton 
         width={iconsSizes[0]} 

@@ -1,3 +1,4 @@
+import MyRect from "../tools/MyRect"
 import DrawBrushHandler from "./DrawBrushHandler"
 
 const LogsHandler = (logs, figures, users, ctx) => {
@@ -8,6 +9,18 @@ const LogsHandler = (logs, figures, users, ctx) => {
             case "brush":
                 DrawBrushHandler(ctx, figure.settings, log.curr, log.prev)
                 break
+            case "rect":
+                MyRect.draw(
+                    ctx,
+                    log.settings.data[0],
+                    log.settings.data[1],
+                    log.settings.data[2],
+                    log.settings.data[3],
+                    log.settings.stroke,
+                    log.settings.width,
+                    log.settings.color
+                )
+
         }
     }
 }
