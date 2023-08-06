@@ -1,10 +1,16 @@
 import MyRect from "../tools/MyRect"
-const DrawMessagesHandler = (msg, figures, logs, canvases, OffscreenCanvases) => {
+
+const createCanvas = (canvases, userId) => {
+    const canvas = document.createElement("canvas")
+    canvas.width = 1920
+    canvas.height = 1080
+    canvases[userId] = canvas
+}
+
+const DrawMessagesHandler = (msg, figures, logs, canvases) => {
     const tool = msg.tool
     const userId = tool.userid
     const figureId = tool.figureid
-    const canvas = OffscreenCanvases[userId].canvas
-    const ctx = OffscreenCanvases[userId].ctx
     switch (tool.name) {
         case "brush":
             switch (tool.method) {
@@ -47,13 +53,17 @@ const DrawMessagesHandler = (msg, figures, logs, canvases, OffscreenCanvases) =>
         case "rect":
             switch (tool.method) {
                 case "start":
-                    MyRect.start(ctx, tool.st, tool.cl, tool.wd)
+                    createCanvas(canvases, userId)
+                    const ctxRectStart = canvases[userId].getContext('2d')
+                    MyRect.start(ctxRectStart, tool.st, tool.cl, tool.wd)
                     break
                 case "move":
-                    MyRect.move(ctx, tool.x, tool.y, tool.w, tool.h)
+                    const ctxRectMove = canvases[userId].getContext('2d')
+                    MyRect.move(ctxRectMove, tool.x, tool.y, tool.w, tool.h)
                     break
                 case "end":
-                    MyRect.end(ctx)
+                    const ctxRectEnd = canvases[userId].getContext('2d')
+                    MyRect.end(ctxRectEnd)
                     const figure = {
                         type: "rect",
                         settings: {
@@ -77,7 +87,7 @@ const DrawMessagesHandler = (msg, figures, logs, canvases, OffscreenCanvases) =>
                         }
                     }
                     logs.push(endLog)
-                    ctx.clearRect(0, 0, canvas.width, canvas.height)
+                    delete canvases[userId]
                     break
             }
         break
