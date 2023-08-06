@@ -79,6 +79,7 @@ const Canvas = () => {
             // console.log(users)
             // console.log(activeUsers)
             OffscreenCanvasesHandler(OffscreenCanvases, users)
+            console.log(OffscreenCanvases)
             break
         }
       }
