@@ -1,8 +1,10 @@
 import MyRect from "../tools/MyRect"
-const DrawMessagesHandler = (msg, figures, logs, canvases) => {
+const DrawMessagesHandler = (msg, figures, logs, canvases, OffscreenCanvases) => {
     const tool = msg.tool
     const userId = tool.userid
     const figureId = tool.figureid
+    const canvas = OffscreenCanvases[userId].canvas
+    const ctx = OffscreenCanvases[userId].ctx
     switch (tool.name) {
         case "brush":
             switch (tool.method) {
@@ -45,20 +47,13 @@ const DrawMessagesHandler = (msg, figures, logs, canvases) => {
         case "rect":
             switch (tool.method) {
                 case "start":
-                    const canvas = document.createElement("canvas")
-                    canvas.width = 1920
-                    canvas.height = 1080
-                    canvases[userId] = canvas
-                    let ctx = canvases[userId].getContext('2d')
                     MyRect.start(ctx, tool.st, tool.cl, tool.wd)
                     break
                 case "move":
-                    let ctx1 = canvases[userId].getContext('2d')
-                    MyRect.move(ctx1, tool.x, tool.y, tool.w, tool.h)
+                    MyRect.move(ctx, tool.x, tool.y, tool.w, tool.h)
                     break
                 case "end":
-                    let ctx2 = canvases[userId].getContext('2d')
-                    MyRect.end(ctx2)
+                    MyRect.end(ctx)
                     const figure = {
                         type: "rect",
                         settings: {
@@ -82,7 +77,7 @@ const DrawMessagesHandler = (msg, figures, logs, canvases) => {
                         }
                     }
                     logs.push(endLog)
-                    delete canvases[userId]
+                    ctx.clearRect(0, 0, canvas.width, canvas.height)
                     break
             }
         break

@@ -24,7 +24,8 @@ export const WebSocketProvider = ({ children }) => {
       socket.send(JSON.stringify({
         method: "init",
         id: sessionID,
-        user: userName
+        user: userName,
+        userid: userId
       }))
       clearInterval(reconnectIntervalRef.current);
     };
