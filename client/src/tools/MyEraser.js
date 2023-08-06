@@ -1,9 +1,8 @@
 import MyTool from "./MyTool"
 
 export default class MyEraser extends MyTool {
-    constructor(color, stroke, width, id, canvas, socket, user) {
-        super(color, stroke, width, id, canvas, socket, user)
-        this.ctx = this.canvas.getContext('2d')
+    constructor(color, stroke, width, id, canvas, socket, user, userid) {
+        super(color, stroke, width, id, canvas, socket, user, userid)
         this.listen()
     }
 
@@ -15,24 +14,25 @@ export default class MyEraser extends MyTool {
     }
     
     start(e) {
-        this.coordinates = []
         this.x = (e.pageX - this.canvas.offsetLeft).toFixed(1)
         this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
-        this.coordinates.push([this.x, this.y])
         this.is_drawing = true
-        this.ctx.beginPath()
-        this.ctx.strokeStyle = "#ffffff"
-        this.ctx.lineWidth = this.width
-        this.ctx.lineCap = "round"
-        this.ctx.lineJoin = "round"
-        this.ctx.moveTo(this.x, this.y)
-        this.ctx.lineTo(this.x, this.y)
-        this.ctx.stroke()
+        this.curr = [this.x, this.y]
+        this.prev = null
+        this.figureid = `${(+new Date()).toString(16)}`
         this.socket.send(JSON.stringify({
-            method: "users",
+            method: "draw",
             id: this.id,
-            user: this.user,
-            state: "start"
+            tool: {
+                name: "eraser",
+                method: "start",
+                curr: this.curr,
+                prev: this.prev,
+                st: "#ffffff",
+                wd: this.width,
+                userid: this.userid,
+                figureid: this.figureid
+            }
         }))
         e.preventDefault()
     }
@@ -43,11 +43,22 @@ export default class MyEraser extends MyTool {
         const newY = (e.pageY - this.canvas.offsetTop).toFixed(1)
         const distance = Math.sqrt((newX - this.x) ** 2 + (newY - this.y) ** 2)
         if (distance > 5) { 
+            this.prev = [this.x, this.y]
             this.x = newX
             this.y = newY
-            this.coordinates.push([this.x, this.y])
-            this.ctx.lineTo(this.x, this.y)
-            this.ctx.stroke()
+            this.curr = [this.x, this.y]
+            this.socket.send(JSON.stringify({
+                method: "draw",
+                id: this.id,
+                tool: {
+                    name: "eraser",
+                    method: "move",
+                    curr: this.curr,
+                    prev: this.prev,
+                    userid: this.userid,
+                    figureid: this.figureid
+                }
+            }))
         }}
         e.preventDefault()
     }
@@ -55,39 +66,52 @@ export default class MyEraser extends MyTool {
     end(e) {
         if (this.is_drawing) {
             this.is_drawing = false
-            this.ctx.closePath()
             this.socket.send(JSON.stringify({
                 method: "draw",
                 id: this.id,
                 tool: {
                     name: "eraser",
-                    xy: this.coordinates,
-                    st: "#ffffff",
+                    method: "end",
+                    userid: this.userid,
                     wd: this.width,
-                    user: this.user
-                }
-            }))
+                    figureid: this.figureid
 
-            this.socket.send(JSON.stringify({
-                method: "users",
-                id: this.id,
-                user: this.user,
-                state: "end"
+                }
             }))
         }
         e.preventDefault()
     }
 
-    static draw(ctx, xy, wd) {
+    static start(ctx, x, y, wd) {
         ctx.beginPath()
-        ctx.moveTo(xy[0][0], xy[0][1])
-        xy.forEach(el => {
-            ctx.lineTo(el[0], el[1])
-        })
         ctx.strokeStyle = "#ffffff"
         ctx.lineWidth = wd
         ctx.lineCap = "round"
         ctx.lineJoin = "round"
+        ctx.moveTo(x, y)
+        ctx.lineTo(x, y)
+        ctx.stroke()
+    }
+
+    static move(ctx, x, y) {
+        ctx.lineTo(x, y)
+        ctx.stroke()
+    }
+
+    static end(ctx) {
+        ctx.closePath()
+    }
+
+    static draw(ctx, xy, st, wd) {
+        ctx.beginPath()
+        ctx.strokeStyle = st
+        ctx.lineWidth = wd
+        ctx.lineCap = "round"
+        ctx.lineJoin = "round"
+        ctx.moveTo(xy[0][0], xy[0][1])
+        xy.forEach(coor => {
+            ctx.lineTo(coor[0], coor[1])
+        })
         ctx.stroke()
         ctx.closePath()
     }

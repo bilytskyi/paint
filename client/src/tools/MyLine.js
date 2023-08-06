@@ -1,9 +1,8 @@
 import MyTool from "./MyTool"
 
 export default class MyLine extends MyTool {
-    constructor(color, stroke, width, id, canvas, socket, user) {
-        super(color, stroke, width, id, canvas, socket, user)
-        this.ctx = this.canvas.getContext('2d')
+    constructor(color, stroke, width, id, canvas, socket, user, userid) {
+        super(color, stroke, width, id, canvas, socket, user, userid)
         this.listen()
     }
 
@@ -18,75 +17,105 @@ export default class MyLine extends MyTool {
         this.x = (e.pageX - this.canvas.offsetLeft).toFixed(1)
         this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
         this.is_drawing = true
-        this.ctx.strokeStyle = this.stroke
-        this.ctx.lineWidth = this.width
-        this.ctx.lineCap = "butt"
-        this.ctx.lineJoin = "miter"
-        this.saved = this.canvas.toDataURL()
+        this.figureid = `${(+new Date()).toString(16)}`
         this.socket.send(JSON.stringify({
-            method: "users",
+            method: "draw",
             id: this.id,
-            user: this.user,
-            state: "start"
+            tool: {
+                name: "line",
+                method: "start",
+                userid: this.userid,
+                st: this.stroke,
+                wd: this.width,
+                figureid: this.figureid,
+            }
         }))
         e.preventDefault()
     }
 
     move(e) {
         if (this.is_drawing) {
-            this.x2 = (e.pageX - this.canvas.offsetLeft).toFixed(1)
-            this.y2 = (e.pageY - this.canvas.offsetTop).toFixed(1)
-            this.draw(this.x2, this.y2)
+            const newX = (e.pageX - this.canvas.offsetLeft).toFixed(1)
+            const newY = (e.pageY - this.canvas.offsetTop).toFixed(1)
+            const distance = Math.sqrt((newX - this.x) ** 2 + (newY - this.y) ** 2)
+            if (distance > 5) { 
+                this.x2 = newX
+                this.y2 = newY
+                this.socket.send(JSON.stringify({
+                    method: "draw",
+                    id: this.id,
+                    tool: {  
+                        name: "line",
+                        method: "move",
+                        x: this.x,
+                        y: this.y,
+                        x2: this.x2,
+                        y2: this.y2,
+                        userid: this.userid,
+                        figureid: this.figureid
+                    }
+                }))
+        }
         }
         e.preventDefault()
     }
 
     end(e) {
         if (this.is_drawing) {
+            this.x2 = (e.pageX - this.canvas.offsetLeft).toFixed(1)
+            this.y2 = (e.pageY - this.canvas.offsetTop).toFixed(1)
             this.is_drawing = false
             this.socket.send(JSON.stringify({
                 method: "draw",
                 id: this.id,
                 tool: {
                     name: "line",
+                    method: "end",
+                    userid: this.userid,
+                    st: this.stroke,
+                    wd: this.width,
                     x: this.x,
                     y: this.y,
                     x2: this.x2,
                     y2: this.y2,
-                    st: this.stroke,
-                    wd: this.width,
-                    user: this.user
+                    figureid: this.figureid
+                    
                 }
-            }))
-
-            this.socket.send(JSON.stringify({
-                method: "users",
-                id: this.id,
-                user: this.user,
-                state: "end"
             }))
         }
         e.preventDefault()
     }
 
-    draw(x, y) {
-        const img = new Image()
-        img.src = this.saved
-        img.onload = () => {
-            this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
-            this.ctx.drawImage(img, 0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
-            this.ctx.beginPath()
-            this.ctx.moveTo(this.x, this.y)
-            this.ctx.lineTo(x, y)
-            this.ctx.stroke()
-            this.ctx.closePath()
-        }
+    static start(ctx, st, wd) {
+        console.log('start')
+        ctx.beginPath()
+        ctx.strokeStyle = st
+        ctx.lineWidth = wd
+        ctx.lineCap = "butt"
+        ctx.lineJoin = "miter"
+    }
+
+    static move(ctx, x, y, x2, y2) {
+        console.log('move')
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        ctx.beginPath()
+        ctx.moveTo(x, y)
+        ctx.lineTo(x2, y2)
+        ctx.stroke()
+        ctx.closePath()
+    }
+
+    static end(ctx) {
+        console.log('end')
+        // ctx.closePath()
     }
 
     static draw(ctx, x, y, x2, y2, st, wd) {
+        ctx.beginPath()
         ctx.strokeStyle = st
         ctx.lineWidth = wd
-        ctx.beginPath()
+        ctx.lineCap = "butt"
+        ctx.lineJoin = "miter"
         ctx.moveTo(x, y)
         ctx.lineTo(x2, y2)
         ctx.stroke()

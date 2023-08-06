@@ -42,7 +42,7 @@ const toolSlice = createSlice({
                     state.toolsSetting.myline.color = action.payload.fillColor
                     break;
                 case 'mycircle':
-                    state.toolsSetting.my.color = action.payload.fillColor
+                    state.toolsSetting.mycircle.color = action.payload.fillColor
                     break;
                 case 'myrect':
                     state.toolsSetting.myrect.color = action.payload.fillColor
