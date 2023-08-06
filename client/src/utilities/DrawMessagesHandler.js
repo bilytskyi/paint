@@ -67,7 +67,6 @@ const DrawMessagesHandler = (msg, figures, logs, canvases) => {
                             width: tool.wd,
                             data: [tool.x, tool.y, tool.w, tool.h]
                         },
-                        xy: [],
                         user: userId
                     }
                     figures[figureId] = figure
