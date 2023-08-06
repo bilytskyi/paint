@@ -33,10 +33,15 @@ const Canvas = () => {
 
   useEffect(() => {
     if (userName && isConnected) {
-      const offCanvas = document.createElement('canvas')
+
+      const offCanvas = document.createElement("canvas")
       offCanvas.width = 1920
       offCanvas.height = 1080
       const offCtx = offCanvas.getContext("2d")
+
+      const canvases = {}
+      canvases["main"] = offCanvas
+
       const figures = {}
       const logs = []
       const users = {}
@@ -60,7 +65,8 @@ const Canvas = () => {
               console.log(`user ${msg.username} join, user id: ${userId}`)
               break
           case "draw":
-            DrawMessagesHandler(msg, figures, logs)
+            DrawMessagesHandler(msg, figures, logs, canvases)
+            console.log(Object.keys(figures).length)
             break
           case "users":
             const activeUsers = {}
@@ -91,11 +97,12 @@ const Canvas = () => {
             lastTimestamp = timestamp;
 
             let sharedCtx = canvasRef.current.getContext('2d');
-            // sharedCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            sharedCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
             // offCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
             LogsHandler(logs.slice(-100), figures, users, offCtx)
-            sharedCtx.drawImage(offCanvas, 0, 0)
-
+            for (let canvas of Object.keys(canvases)) {
+              sharedCtx.drawImage(canvases[canvas], 0, 0)
+            }
         }
 
         

@@ -75,7 +75,8 @@ export default class MyRect extends MyTool {
                     x: this.x,
                     y: this.y,
                     w: this.x2 - this.x,
-                    h: this.y2 - this.y
+                    h: this.y2 - this.y,
+                    
                 }
             }))
         }
