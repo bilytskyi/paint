@@ -16,6 +16,7 @@ import { useWebSocket } from '../utilities/WebSocketContext';
 // import { useCanvases } from "../utilities/CanvasesContext";
 import DrawMessagesHandler from "../utilities/DrawMessagesHandler";
 import LogsHandler from "../utilities/LogsHandler";
+import OffscreenCanvasesHandler from "../utilities/OffscreenCanvasesHandler";
 
 const Canvas = () => {
   // const link = '16.170.240.78'
@@ -29,7 +30,7 @@ const Canvas = () => {
   const dispatch = useDispatch();
   const userName = useSelector(state => state.canvas.username);
   const userId = useSelector(state => state.canvas.userId);
-  const shapes = []
+  const activeUsers = useSelector(state => state.canvas.users)
 
   useEffect(() => {
     if (userName && isConnected) {
@@ -45,10 +46,10 @@ const Canvas = () => {
       const figures = {}
       const logs = []
       const users = {}
-      users[userId] = {
-        name: userName,
-        prev: null,
-        progress: 0
+      const OffscreenCanvases = {}
+      OffscreenCanvases["main"] = {
+        canvas: offCanvas,
+        ctx: offCanvas.getContext("2d")
       }
       dispatch(setSessionID(params.id))
       const socket = websocket
@@ -65,21 +66,19 @@ const Canvas = () => {
               console.log(`user ${msg.username} join, user id: ${userId}`)
               break
           case "draw":
-            DrawMessagesHandler(msg, figures, logs, canvases)
-            console.log(Object.keys(figures).length)
+            DrawMessagesHandler(msg, figures, logs, canvases, OffscreenCanvases)
+            console.log(logs, figures)
             break
           case "users":
-            const activeUsers = {}
             for (let user of Object.keys(msg.users)) {
-              if (!activeUsers[user]) {
-                activeUsers[user] = {
-                  name: msg.users[user].username, 
-                  prev: null,
-                  progress: 0
-                }
+              if (!users[user]) {
+                users[user] = msg.users[user].username
               }
             }
-            dispatch(setUsers(activeUsers))
+            // dispatch(setUsers(users))
+            // console.log(users)
+            // console.log(activeUsers)
+            OffscreenCanvasesHandler(OffscreenCanvases, users)
             break
         }
       }
@@ -99,10 +98,10 @@ const Canvas = () => {
             let sharedCtx = canvasRef.current.getContext('2d');
             sharedCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
             // offCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-            for (let canvas of Object.keys(canvases)) {
-              sharedCtx.drawImage(canvases[canvas], 0, 0)
-            }
             LogsHandler(logs.slice(-100), figures, users, offCtx)
+            for (let canvas of Object.keys(OffscreenCanvases)) {
+              sharedCtx.drawImage(OffscreenCanvases[canvas].canvas, 0, 0)
+            }
         }
 
         

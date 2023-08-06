@@ -161,7 +161,7 @@ const broadcastConnection = (ws, msg) => {
         if (client.id === msg.id) {
             client.send(JSON.stringify(msg))
         }
-        if (msg.method === 'heartbeat') {
+        if (msg.method === 'heartbeat' || msg.method === 'init') {
             // Store or update the active user information in the specific room
             updateUserActivity(msg.id, msg.user, msg.userid);
           }
