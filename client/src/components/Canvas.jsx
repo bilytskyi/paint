@@ -66,8 +66,8 @@ const Canvas = () => {
               console.log(`user ${msg.username} join, user id: ${userId}`)
               break
           case "draw":
-            DrawMessagesHandler(msg, figures, logs, canvases, OffscreenCanvases)
-            console.log(logs, figures)
+            DrawMessagesHandler(msg, figures, logs, canvases)
+            console.log(Object.keys(canvases).length)
             break
           case "users":
             for (let user of Object.keys(msg.users)) {
@@ -78,8 +78,6 @@ const Canvas = () => {
             // dispatch(setUsers(users))
             // console.log(users)
             // console.log(activeUsers)
-            OffscreenCanvasesHandler(OffscreenCanvases, users)
-            console.log(OffscreenCanvases)
             break
         }
       }
@@ -100,8 +98,8 @@ const Canvas = () => {
             sharedCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
             // offCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
             LogsHandler(logs.slice(-100), figures, users, offCtx)
-            for (let canvas of Object.keys(OffscreenCanvases)) {
-              sharedCtx.drawImage(OffscreenCanvases[canvas].canvas, 0, 0)
+            for (let canvas of Object.keys(canvases)) {
+              sharedCtx.drawImage(canvases[canvas], 0, 0)
             }
         }
 
