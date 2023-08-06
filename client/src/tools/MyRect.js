@@ -17,7 +17,6 @@ export default class MyRect extends MyTool {
         this.x = (e.pageX - this.canvas.offsetLeft).toFixed(1)
         this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
         this.is_drawing = true
-        localStorage.setItem("rectSaved", this.canvas.toDataURL())
         this.figureid = `${(+new Date()).toString(16)}`
         this.socket.send(JSON.stringify({
             method: "draw",
@@ -29,7 +28,7 @@ export default class MyRect extends MyTool {
                 cl: this.color,
                 st: this.stroke,
                 wd: this.width,
-                figureid: this.figureid
+                figureid: this.figureid,
             }
         }))
         e.preventDefault()
@@ -97,17 +96,12 @@ export default class MyRect extends MyTool {
     }
 
     static move(ctx, x, y, w, h) {
-        const img = new Image()
-        img.src = localStorage.getItem("rectSaved")
-        img.onload = () => {
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-            ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height)
-            ctx.beginPath()
-            ctx.rect(x, y, w, h)
-            ctx.fill()
-            ctx.stroke()
-            ctx.closePath()
-        }
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        ctx.beginPath()
+        ctx.rect(x, y, w, h)
+        ctx.fill()
+        ctx.stroke()
+        ctx.closePath()
     }
 
     static end(ctx) {
