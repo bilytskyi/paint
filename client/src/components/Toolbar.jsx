@@ -93,7 +93,7 @@ const Toolbar = () => {
         new MyEraser(toolsSetting.myeraser, sessionID, userName, websocket, userId)
         break;
       case 'mymouse':
-        new MyMouse()
+        new MyMouse(toolsSetting.mymouse, sessionID, userName, websocket, userId)
         break;
     }
   }, [toolsSetting])
@@ -173,6 +173,28 @@ const Toolbar = () => {
       id: sessionID,
       tool: {
         name: "clear"
+      }
+    }))
+  }
+
+  const undo = () => {
+    websocket.send(JSON.stringify({
+      method: "draw",
+      id: sessionID,
+      tool: {
+        name: "undo",
+        userid: userId
+      }
+    }))
+  }
+
+  const redo = () => {
+    websocket.send(JSON.stringify({
+      method: "draw",
+      id: sessionID,
+      tool: {
+        name: "redo",
+        userid: userId
       }
     }))
   }
@@ -286,6 +308,8 @@ window.addEventListener("click", (e) => {
         <button onClick={() => {dispatch(setCurrentTool('mycircle'))}}>circle</button>
         <button onClick={() => {dispatch(setCurrentTool('myline'))}}>line</button>
         <button onClick={() => {dispatch(setCurrentTool('myeraser'))}}>eraser</button>
+        <button onClick={() => {undo()}}>undo</button>
+        <button onClick={() => {redo()}}>redo</button>
 
         {/* <EraserButton 
         width={iconsSizes[0]} 

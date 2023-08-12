@@ -1,15 +1,27 @@
 import MyCircle from "../tools/MyCircle"
 import MyLine from "../tools/MyLine"
 import MyRect from "../tools/MyRect"
+import MyBrush from "../tools/MyBrush"
 import DrawBrushHandler from "./DrawBrushHandler"
 
-const LogsHandler = (logs, figures, users, ctx) => {
+const LogsHandler = (logs, figures, ctx) => {
     for (let log of logs) {
-        const user = users[log.user]
+        if (log === null) {
+            continue
+        }
         const figure = figures[log.figure]
         switch (figure.type) {
             case "brush":
-                DrawBrushHandler(ctx, figure.settings, log.curr, log.prev)
+                if (figure.version === 0) {
+                    DrawBrushHandler(ctx, figure.versions[0].settings, log.curr, log.prev)
+                } else {
+                    MyBrush.draw(
+                        ctx,
+                        log.settings.xy,
+                        log.settings.stroke,
+                        log.settings.width
+                    )
+                }
                 break
             case "rect":
                 MyRect.draw(
@@ -46,7 +58,7 @@ const LogsHandler = (logs, figures, users, ctx) => {
                 )
                 break
             case "eraser":
-                DrawBrushHandler(ctx, figure.settings, log.curr, log.prev)
+                DrawBrushHandler(ctx, figure.versions[0].settings, log.curr, log.prev)
                 break
 
         }
