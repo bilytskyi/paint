@@ -34,6 +34,10 @@ const Canvas = () => {
 
   useEffect(() => {
     if (userName && isConnected) {
+      dispatch(setCurrentTool('mymouse'))
+      dispatch(setCurrentTool('mybrush'))
+      dispatch(setCurrentTool('mymouse'))
+      const selectedFigure = {id: null}
 
       const offCanvas = document.createElement("canvas")
       offCanvas.width = 1920
@@ -64,10 +68,12 @@ const Canvas = () => {
         switch (msg.method) {
           case "connection":
               console.log(`user ${msg.username} join, user id: ${userId}`)
+              // LogsHandler(logs, figures, offCtx)
               break
           case "draw":
-            DrawMessagesHandler(msg, figures, logs, canvases)
-            console.log(logs.length)
+            DrawMessagesHandler(msg, figures, logs, canvases, selectedFigure, offCtx)
+            // console.log(logs)
+            console.log(figures)
             break
           case "users":
             for (let user of Object.keys(msg.users)) {
@@ -101,7 +107,7 @@ const Canvas = () => {
             sharedCtx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height)
 
             // offCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-            LogsHandler(logs.slice(-100), figures, users, offCtx)
+            LogsHandler(logs.slice(-25), figures, offCtx)
             for (let canvas of Object.keys(canvases)) {
               sharedCtx.drawImage(canvases[canvas], 0, 0)
             }

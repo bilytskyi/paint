@@ -116,4 +116,19 @@ export default class MyBrush extends MyTool {
         ctx.stroke()
         ctx.closePath()
     }
+
+    static draggingAnimation(ctx, xy, st, wd) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        ctx.beginPath()
+        ctx.strokeStyle = st
+        ctx.lineWidth = wd
+        ctx.lineCap = "round"
+        ctx.lineJoin = "round"
+        ctx.moveTo(xy[0][0], xy[0][1])
+        xy.forEach(coor => {
+            ctx.lineTo(coor[0], coor[1])
+        })
+        ctx.stroke()
+        ctx.closePath()
+    }
 }
