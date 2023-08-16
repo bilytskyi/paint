@@ -1,5 +1,5 @@
 import LogsHandler from "./LogsHandler"
-import { createEdges, createLog, selectFigure, animationOfDragging } from "./utils"
+import { createEdges, createLog, selectFigure, animationOfDragging, updateFigure } from "./utils"
 
 const DraggingMessagesHandler = (userId, figures, data, selectedFigure, canvases, logs) => {
     switch (data.method) {
@@ -21,36 +21,42 @@ const DraggingMessagesHandler = (userId, figures, data, selectedFigure, canvases
                     figure.is_redraw = true
                 }
                 // draggings animations
-                console.log(figure.is_redraw)
                 animationOfDragging(userId, canvases, selectedFigure, figures, data)
             }
             break
         case "end":
             if (selectedFigure.id !== null) {
                 const figure = figures[selectedFigure.id]
-                figure.is_redraw = false
-                figure.version = figure.version + 1
-                figure.versions.push({
-                    settings: {
-                        stroke: figure.new_data.st,
-                        width: figure.new_data.wd
-                    },
-                    logs: {},
-                    edges: [],
-                    xy: figure.new_data.xy,
-                    user: userId
-                })
-
-                let log = createLog("moved_brush", userId, selectedFigure.id, figure.new_data)
-                let j = logs.length
-                figure.versions[figure.version].logs[j] = log
-                logs.push(log)
-
-                createEdges(selectedFigure.id, figures)
-
-                selectedFigure.id = null
-                delete canvases[userId]
-                console.log(figure.is_redraw)
+                if (figure.version < figure.versions.length - 1) {
+                    figure.version = figure.version + 1
+                    figure.versions = figure.versions.slice(0, figure.version)
+                    let type = figure.type
+                    figure.is_redraw = false
+                    updateFigure(type, userId, figure.new_data, figure)
+                    if (type === "brush" || type === "eraser") {
+                        type = "moved_brush_eraser"
+                    }
+                    let log = createLog(type, userId, selectedFigure.id, figure.new_data)
+                    let j = logs.length
+                    figure.versions[figure.version].logs[j] = log
+                    logs.push(log)
+                    createEdges(selectedFigure.id, figures)
+                    delete canvases[userId]
+                } else {
+                    let type = figure.type
+                    figure.is_redraw = false
+                    figure.version = figure.version + 1
+                    updateFigure(type, userId, figure.new_data, figure)
+                    if (type === "brush" || type === "eraser") {
+                        type = "moved_brush_eraser"
+                    }
+                    let log = createLog(type, userId, selectedFigure.id, figure.new_data)
+                    let j = logs.length
+                    figure.versions[figure.version].logs[j] = log
+                    logs.push(log)
+                    createEdges(selectedFigure.id, figures)
+                    delete canvases[userId]
+                }
             }
             break
     }

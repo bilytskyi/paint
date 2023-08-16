@@ -9,11 +9,11 @@ const EraserMessagesHandler = (userId, figureId, data, figures, logs) => {
             log = createLog("eraser", userId, figureId, data)
             figure.versions[0].logs[j] = log
             figures[figureId] = figure
-            figures[figureId].versions[0].xy.push(data.curr)                  
+            figures[figureId].versions[0].settings.data.push(data.curr)                  
             logs.push(log)
             break
         case "move":
-            figures[figureId].versions[0].xy.push(data.curr)
+            figures[figureId].versions[0].settings.data.push(data.curr)
             log = createLog("eraser", userId, figureId, data)
             figures[figureId].versions[0].logs[j] = log
             logs.push(log)

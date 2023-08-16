@@ -75,14 +75,13 @@ export default class MyRect extends MyTool {
                     name: "rect",
                     method: "end",
                     userid: this.userid,
-                    cl: this.color,
-                    st: this.stroke,
-                    wd: this.width,
-                    x: this.x,
-                    y: this.y,
-                    w: this.w,
-                    h: this.h,
-                    figureid: this.figureid
+                    figureid: this.figureid,
+                    settings: {
+                        color: this.color,
+                        stroke: this.stroke,
+                        width: this.width,
+                        data: [this.x, this.y, this.w, this.h]
+                    }
                     
                 }
             }))
@@ -113,6 +112,20 @@ export default class MyRect extends MyTool {
     }
 
     static draw(ctx, x, y, w, h, st, wd, cl) {
+        ctx.beginPath()
+        ctx.fillStyle = cl
+        ctx.strokeStyle = st
+        ctx.lineWidth = wd
+        ctx.lineCap = "butt"
+        ctx.lineJoin = "miter"
+        ctx.rect(x, y, w, h)
+        ctx.fill()
+        ctx.stroke()
+        ctx.closePath()
+    }
+
+    static draggingAnimation(ctx, x, y, w, h, st, wd, cl) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         ctx.beginPath()
         ctx.fillStyle = cl
         ctx.strokeStyle = st
