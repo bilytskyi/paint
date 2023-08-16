@@ -72,12 +72,11 @@ export default class MyLine extends MyTool {
                     name: "line",
                     method: "end",
                     userid: this.userid,
-                    st: this.stroke,
-                    wd: this.width,
-                    x: this.x,
-                    y: this.y,
-                    x2: this.x2,
-                    y2: this.y2,
+                    settings: {
+                        stroke: this.stroke,
+                        width: this.width,
+                        data: [this.x, this.y, this.x2, this.y2]
+                    },
                     figureid: this.figureid
                     
                 }
@@ -111,6 +110,19 @@ export default class MyLine extends MyTool {
     }
 
     static draw(ctx, x, y, x2, y2, st, wd) {
+        ctx.beginPath()
+        ctx.strokeStyle = st
+        ctx.lineWidth = wd
+        ctx.lineCap = "butt"
+        ctx.lineJoin = "miter"
+        ctx.moveTo(x, y)
+        ctx.lineTo(x2, y2)
+        ctx.stroke()
+        ctx.closePath()
+    }
+
+    static draggingAnimation(ctx, x, y, x2, y2, st, wd) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         ctx.beginPath()
         ctx.strokeStyle = st
         ctx.lineWidth = wd

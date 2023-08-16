@@ -74,12 +74,12 @@ export default class MyCircle extends MyTool {
                     name: "circle",
                     method: "end",
                     userid: this.userid,
-                    cl: this.color,
-                    st: this.stroke,
-                    wd: this.width,
-                    x: this.x,
-                    y: this.y,
-                    r: this.r,
+                    settings: {
+                        color: this.color,
+                        stroke: this.stroke,
+                        width: this.width,
+                        data: [this.x, this.y, this.r]
+                    },
                     figureid: this.figureid
                     
                 }
@@ -122,4 +122,19 @@ export default class MyCircle extends MyTool {
         ctx.stroke()
         ctx.closePath()
     }
+
+    static draggingAnimation(ctx, x, y, r, st, wd, cl) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        ctx.beginPath()
+        ctx.fillStyle = cl
+        ctx.strokeStyle = st
+        ctx.lineWidth = wd
+        ctx.lineCap = "butt"
+        ctx.lineJoin = "miter"
+        ctx.arc(x, y, r, 0, 2 * Math.PI)
+        ctx.fill()
+        ctx.stroke()
+        ctx.closePath()
+    }
+
 }

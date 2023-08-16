@@ -1,7 +1,7 @@
 import "../styles/canvas.scss"
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import {setCanvas, setUsers, setData, setUserId, pushToUndo, setSessionID, setUserName, setSocket, setTestAction} from '../store/canvasSlice';
+import {setCanvas, setSelected, setData, setUserId, pushToUndo, setSessionID, setUserName, setSocket, setTestAction} from '../store/canvasSlice';
 import {setCurrentTool} from '../store/toolSlice';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -38,7 +38,10 @@ const Canvas = () => {
       dispatch(setCurrentTool('mybrush'))
       dispatch(setCurrentTool('mymouse'))
       const selectedFigure = {id: null}
-
+      const actions = {
+        data: [],
+        current: -1
+      }
       const offCanvas = document.createElement("canvas")
       offCanvas.width = 1920
       offCanvas.height = 1080
@@ -71,9 +74,10 @@ const Canvas = () => {
               // LogsHandler(logs, figures, offCtx)
               break
           case "draw":
-            DrawMessagesHandler(msg, figures, logs, canvases, selectedFigure, offCtx)
+            DrawMessagesHandler(msg, figures, logs, canvases, selectedFigure, actions)
+            console.log(actions)
             // console.log(logs)
-            console.log(figures)
+            // console.log(figures)
             break
           case "users":
             for (let user of Object.keys(msg.users)) {

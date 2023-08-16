@@ -17,7 +17,7 @@ const LogsHandler = (logs, figures, ctx) => {
                 } else {
                     MyBrush.draw(
                         ctx,
-                        log.settings.xy,
+                        log.settings.data,
                         log.settings.stroke,
                         log.settings.width
                     )
@@ -58,7 +58,16 @@ const LogsHandler = (logs, figures, ctx) => {
                 )
                 break
             case "eraser":
-                DrawBrushHandler(ctx, figure.versions[0].settings, log.curr, log.prev)
+                if (figure.version === 0) {
+                    DrawBrushHandler(ctx, figure.versions[0].settings, log.curr, log.prev)
+                } else {
+                    MyBrush.draw(
+                        ctx,
+                        log.settings.data,
+                        log.settings.stroke,
+                        log.settings.width
+                    )
+                }
                 break
 
         }
