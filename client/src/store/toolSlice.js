@@ -4,7 +4,7 @@ const toolSlice = createSlice({
     name: 'tool',
     initialState: {
         toolsSetting: {
-            currentTool: 'mybrush',
+            currentTool: 'frodo',
             line: {color: '#10a8ea', stroke: '#10a8ea', width: 2},
             brush: {color: '#10a8ea', stroke: '#000000', width: 30},
             circle: {color: '#ffffff', stroke: '#000000', width: 1},
@@ -15,7 +15,8 @@ const toolSlice = createSlice({
             mycircle: {color: "#FFFFFF", stroke: '#000000', width: 2},
             myline: {color: '#A52A2A', stroke: '#FF0000', width: 2},
             myeraser: {color: "#FFFFFF", stroke: "#FFFFFF", width: 20},
-            mymouse: {color: "#FFFFFF", stroke: "#FFFFFF", width: 10}
+            mymouse: {color: "#FFFFFF", stroke: "#FFFFFF", width: 10},
+            frodo: {color: "#FFFFFF", stroke: "#FFFFFF", width: 10}
         },
         tool: null
     },
