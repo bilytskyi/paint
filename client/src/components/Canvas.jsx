@@ -36,7 +36,6 @@ const Canvas = () => {
     if (userName && isConnected) {
       dispatch(setCurrentTool('mymouse'))
       dispatch(setCurrentTool('mybrush'))
-      dispatch(setCurrentTool('mymouse'))
       const selectedFigure = {id: null}
       const actions = {
         data: [],
