@@ -14,8 +14,8 @@ export default class MyMouse extends MyTool {
     }
     
     start(e) {
-        this.x = (e.pageX - this.canvas.offsetLeft).toFixed(1)
-        this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
+        this.x = (e.offsetX - this.canvas.offsetLeft).toFixed(1)
+        this.y = (e.offsetY - this.canvas.offsetTop).toFixed(1)
         this.is_dragging = true
         this.is_move = false
         this.socket.send(JSON.stringify({
@@ -35,8 +35,8 @@ export default class MyMouse extends MyTool {
     move(e) {
         if (this.is_dragging) {
             this.is_move = true
-            this.x2 = (e.pageX - this.canvas.offsetLeft).toFixed(1)
-            this.y2 = (e.pageY - this.canvas.offsetTop).toFixed(1)
+            this.x2 = (e.offsetX - this.canvas.offsetLeft).toFixed(1)
+            this.y2 = (e.offsetY - this.canvas.offsetTop).toFixed(1)
             this.socket.send(JSON.stringify({
                 method: "draw",
                 id: this.id,

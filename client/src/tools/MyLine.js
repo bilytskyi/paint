@@ -14,8 +14,8 @@ export default class MyLine extends MyTool {
     }
     
     start(e) {
-        this.x = (e.pageX - this.canvas.offsetLeft).toFixed(1)
-        this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
+        this.x = (e.offsetX - this.canvas.offsetLeft).toFixed(1)
+        this.y = (e.offsetY - this.canvas.offsetTop).toFixed(1)
         this.is_drawing = true
         this.figureid = `${(+new Date()).toString(16)}`
         this.socket.send(JSON.stringify({
@@ -35,8 +35,8 @@ export default class MyLine extends MyTool {
 
     move(e) {
         if (this.is_drawing) {
-            const newX = (e.pageX - this.canvas.offsetLeft).toFixed(1)
-            const newY = (e.pageY - this.canvas.offsetTop).toFixed(1)
+            const newX = (e.offsetX - this.canvas.offsetLeft).toFixed(1)
+            const newY = (e.offsetY - this.canvas.offsetTop).toFixed(1)
             const distance = Math.sqrt((newX - this.x) ** 2 + (newY - this.y) ** 2)
             if (distance > 5) { 
                 this.x2 = newX
@@ -62,8 +62,8 @@ export default class MyLine extends MyTool {
 
     end(e) {
         if (this.is_drawing) {
-            this.x2 = (e.pageX - this.canvas.offsetLeft).toFixed(1)
-            this.y2 = (e.pageY - this.canvas.offsetTop).toFixed(1)
+            this.x2 = (e.offsetX - this.canvas.offsetLeft).toFixed(1)
+            this.y2 = (e.offsetY - this.canvas.offsetTop).toFixed(1)
             this.is_drawing = false
             this.socket.send(JSON.stringify({
                 method: "draw",

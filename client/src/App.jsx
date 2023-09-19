@@ -15,8 +15,8 @@ function App() {
     <BrowserRouter>
     <>
     <Routes>
-  <Route path='/:id' element={<><Toolbar/><Canvas /></>} />
-  <Route path='/' element={<><Toolbar/><Canvas /><Navigate to={`/f${(+new Date()).toString(16)}`} replace/></>} />
+  <Route path='/:id' element={<><Canvas /></>} />
+  <Route path='/' element={<><Canvas /><Navigate to={`/f${(+new Date()).toString(16)}`} replace/></>} />
 </Routes>
     </>
     </BrowserRouter>

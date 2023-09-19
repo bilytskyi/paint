@@ -17,6 +17,7 @@ import { useWebSocket } from '../utilities/WebSocketContext';
 import DrawMessagesHandler from "../utilities/DrawMessagesHandler";
 import LogsHandler from "../utilities/LogsHandler";
 import OffscreenCanvasesHandler from "../utilities/OffscreenCanvasesHandler";
+import Toolbar from "./Toolbar";
 
 const Canvas = () => {
   // const link = '16.170.240.78'
@@ -320,6 +321,7 @@ const Canvas = () => {
 
   return (
     <div className='canvas' >
+      <Toolbar />
       <Modal show={modal} onHide={() => {}}>
         <Modal.Header>
           <Modal.Title>Enter your name</Modal.Title>

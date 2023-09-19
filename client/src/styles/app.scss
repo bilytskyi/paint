@@ -6,9 +6,23 @@
     box-sizing: border-box;
 }
 
-.app {
-    height: 100vh;
-    max-height: 100vh;
-    width: 100vw;
-    background-color: $background-color;
+// .app {
+//     height: 100vh;
+//     max-height: 100vh;
+//     width: 100vw;
+//     background-color: $background-color;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+// }
+@media screen and (min-width: 1920px) {
+    div#root {
+        height: 100vh;
+        max-height: 100vh;
+        width: 100vw;
+        background-color: $background-color;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }
