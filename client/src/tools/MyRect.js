@@ -14,8 +14,8 @@ export default class MyRect extends MyTool {
     }
     
     start(e) {
-        this.x = (e.pageX - this.canvas.offsetLeft).toFixed(1)
-        this.y = (e.pageY - this.canvas.offsetTop).toFixed(1)
+        this.x = (e.offsetX - this.canvas.offsetLeft).toFixed(1)
+        this.y = (e.offsetY - this.canvas.offsetTop).toFixed(1)
         this.w = 0
         this.h = 0
         this.is_drawing = true
@@ -38,8 +38,8 @@ export default class MyRect extends MyTool {
 
     move(e) {
         if (this.is_drawing) {
-            const newX = (e.pageX - this.canvas.offsetLeft).toFixed(1)
-            const newY = (e.pageY - this.canvas.offsetTop).toFixed(1)
+            const newX = (e.offsetX - this.canvas.offsetLeft).toFixed(1)
+            const newY = (e.offsetY - this.canvas.offsetTop).toFixed(1)
             const distance = Math.sqrt((newX - this.x) ** 2 + (newY - this.y) ** 2)
             if (distance > 5) { 
                 this.x2 = newX

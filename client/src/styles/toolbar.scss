@@ -5,7 +5,7 @@
     padding-right: 6px;
     padding-top: 12px;
     padding-bottom: 12px;
-    position: fixed;
+    position: absolute;
     background-color: white;
     border: solid 1px grey;
     border-radius: 37px;
@@ -14,8 +14,9 @@
     justify-content: center;
     align-items: center;
     gap: 6px;
-    top: 24%;
-    left: 32px;
+    left: 2%;
+    top: 30%;
+    z-index: 2;
 
     &__btn {
         height: 36px;

@@ -17,8 +17,9 @@
 // }
 
 .canvas {
-    top: 0;
-    left: 0;
+    position: relative;
+    width: 1920px;
+    height: 1080px;
 }
 
 .mouse {
@@ -48,3 +49,13 @@
 #canvas {
     touch-action: none;
 }
+
+@media screen and (min-width: 1920px) {
+    canvas {
+      border: black solid 1px;
+    }
+    .canvas {
+        display: flex;
+        justify-content: center;
+    }
+  }
